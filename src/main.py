@@ -68,7 +68,9 @@ class GameSpace:
 					sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
-					print(pos)
+					if pos[0] >= 494 and pos[0] <= 594:
+						if pos[1] >= 140 and pos[1] <= 170:
+							clicked = True
 		self.main()
 
 	def main(self):
