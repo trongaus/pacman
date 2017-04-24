@@ -4,6 +4,8 @@
 import sys, pygame
 
 class Ghost(pygame.sprite.Sprite):
+
+	# initialize the ghost sprite
 	def __init__(self, gs, png):
 		pygame.sprite.Sprite.__init__(self)
 		imgpath = "../img/"

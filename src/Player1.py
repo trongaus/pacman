@@ -4,6 +4,8 @@
 import sys, pygame
 
 class Player1(pygame.sprite.Sprite):
+
+	# initialize the pacman player sprite
 	def __init__(self, gs):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-left-closed.png"))
@@ -21,6 +23,7 @@ class Player1(pygame.sprite.Sprite):
 		self.rect = _new
 		pygame.event.pump()
 
+	# move the pacman piece and update the image depending on the direction
 	def move(self, direction):
 		if direction == 'left':
 			self.movepos[0] = self.movepos[0] - self.speed

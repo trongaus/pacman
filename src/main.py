@@ -7,6 +7,7 @@ import Ghost as gh
 
 class GameSpace:
 
+	# main gamsepace and sprites initialization
 	def __init__(self):
 		pygame.init()
 		self.size = self.width, self.height = 640, 496
@@ -33,6 +34,7 @@ class GameSpace:
 		self.pink_ghost.rect.centerx -= 30
 		self.orange_ghost = gh.Ghost(self, "ghost-orange-up.png")
 
+	# blit all changes to the screen
 	def update(self):
 		self.screen.fill(self.black)
 		self.screen.blit(self.image, self.rect)
@@ -43,9 +45,11 @@ class GameSpace:
 		self.screen.blit(self.pink_ghost.image, self.pink_ghost.rect)
 		self.screen.blit(self.orange_ghost.image, self.orange_ghost.rect)
 
+	# run this function until the start button is pressed
 	def start(self):
 		clicked = False
 		self.update()
+		# update the screen with the directions and start button
 		pygame.draw.rect(self.screen, (255,255,255), (494,140,100,30))
 		text1 = "Use the arrow keys to move,"
 		text2 = "eat all the dots and"
@@ -68,11 +72,13 @@ class GameSpace:
 					sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
+					# determine if user clicked w/in the range of the start button
 					if pos[0] >= 494 and pos[0] <= 594:
 						if pos[1] >= 140 and pos[1] <= 170:
 							clicked = True
 		self.main()
 
+	# main begins once we press the start button
 	def main(self):
 		pygame.key.set_repeat(1,100)
 		while 1:
