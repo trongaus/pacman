@@ -10,6 +10,8 @@ class GameSpace:
 	# main gamsepace and sprites initialization
 	def __init__(self):
 		pygame.init()
+		self.clock = pygame.time.Clock()
+		self.sound = "../sounds/pacman_chomp.wav"
 		self.size = self.width, self.height = 640, 496
 		self.black = 0,0,0
 		self.screen = pygame.display.set_mode(self.size)
@@ -24,7 +26,6 @@ class GameSpace:
 		self.rect = self.image.get_rect()
 		self.rect.centerx = 224 
 		self.rect.centery = 248
-		self.clock = pygame.time.Clock()
 		self.player1 = p1.Player1(self)
 		self.red_ghost = gh.Ghost(self,"ghost-red-up.png")
 		self.red_ghost.rect.centery -= 42
@@ -48,6 +49,8 @@ class GameSpace:
 	# run this function until the start button is pressed
 	def start(self):
 		clicked = False
+		pygame.mixer.music.load("../sounds/pacman_beginning.wav")
+		pygame.mixer.music.play()
 		self.update()
 		# update the screen with the directions and start button
 		pygame.draw.rect(self.screen, (255,255,255), (494,140,100,30))
@@ -81,6 +84,9 @@ class GameSpace:
 	# main begins once we press the start button
 	def main(self):
 		pygame.key.set_repeat(1,100)
+		# need to figure out how to add in the proper sound effects
+		#pygame.mixer.music.load(self.sound)
+		#pygame.mixer.music.play(-1)
 		while 1:
 			# clock tick
 			self.clock.tick(60)
