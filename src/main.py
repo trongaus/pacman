@@ -13,6 +13,7 @@ class GameSpace:
 		self.black = 0,0,0
 		self.screen = pygame.display.set_mode(self.size)
 		pygame.display.set_caption('Pac-Man')
+		self.font = pygame.font.SysFont("liberationsans", 15)
 		self.logo = pygame.image.load("../img/logo.png")
 		self.logorect = self.logo.get_rect()
 		self.logorect.centerx = 546
@@ -45,10 +46,26 @@ class GameSpace:
 	def start(self):
 		clicked = False
 		self.update()
-		pygame.draw.rect(self.screen, (255,255,255), (480,200,60,30))
+		pygame.draw.rect(self.screen, (255,255,255), (494,140,100,30))
+		text1 = "Use the arrow keys to move,"
+		text2 = "eat all the dots and"
+		text3 = "avoid the ghosts."
+		text4 = "PLAY"
+		directions = self.font.render("DIRECTIONS:", 1, (255,255,255))
+		directions1 = self.font.render(text1, 1, (255,255,255))
+		directions2 = self.font.render(text2, 1, (255,255,255))
+		directions3 = self.font.render(text3, 1, (255,255,255))
+		button1 = self.font.render(text4, 1, (0,0,0))
+		self.screen.blit(directions, (500, 56))
+		self.screen.blit(directions1, (452, 72))
+		self.screen.blit(directions2, (452, 88))
+		self.screen.blit(directions3, (452, 104))
+		self.screen.blit(button1, (526, 144))
 		pygame.display.update()			
 		while not clicked:
 			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
 					print(pos)
