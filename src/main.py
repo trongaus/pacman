@@ -15,6 +15,8 @@ class GameSpace:
 		self.size = self.width, self.height = 640, 496
 		self.black = 0,0,0
 		self.screen = pygame.display.set_mode(self.size)
+		self.board = [[]]
+		self.readBoard()
 		pygame.display.set_caption('Pac-Man')
 		self.font = pygame.font.SysFont("liberationsans", 15)
 		self.logo = pygame.image.load("../img/logo.png")
@@ -34,6 +36,11 @@ class GameSpace:
 		self.pink_ghost = gh.Ghost(self, "ghost-pink-up.png")
 		self.pink_ghost.rect.centerx -= 30
 		self.orange_ghost = gh.Ghost(self, "ghost-orange-up.png")
+
+	# read in the board.txt file as a 2D array
+	def readBoard(self):
+		with open('board.txt') as file:
+			self.board = [[digit for digit in line.split()] for line in file]
 
 	# blit all changes to the screen
 	def update(self):
@@ -96,13 +103,13 @@ class GameSpace:
 					sys.exit()
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_LEFT:
-						self.player1.move('left')
+						self.player1.move(self, 'left')
 					elif event.key == pygame.K_RIGHT:
-						self.player1.move('right')
+						self.player1.move(self, 'right')
 					elif event.key == pygame.K_UP:
-						self.player1.move('up')
+						self.player1.move(self, 'up')
 					elif event.key == pygame.K_DOWN:
-						self.player1.move('down')
+						self.player1.move(self, 'down')
 
 			# update the screen
 			self.update()
