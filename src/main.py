@@ -30,12 +30,17 @@ class GameSpace:
 		self.rect.centery = 248
 		self.player1 = p1.Player1(self)
 		self.red_ghost = gh.Ghost(self,"ghost-red-up.png")
+		self.red_ghost.rect.centerx -= 60
 		self.red_ghost.rect.centery -= 42
 		self.blue_ghost = gh.Ghost(self, "ghost-blue-up.png")
-		self.blue_ghost.rect.centerx += 30
+		self.blue_ghost.rect.centerx -= 20
+		self.blue_ghost.rect.centery -= 42
 		self.pink_ghost = gh.Ghost(self, "ghost-pink-up.png")
-		self.pink_ghost.rect.centerx -= 30
+		self.pink_ghost.rect.centerx += 20
+		self.pink_ghost.rect.centery -= 42
 		self.orange_ghost = gh.Ghost(self, "ghost-orange-up.png")
+		self.orange_ghost.rect.centerx += 60
+		self.orange_ghost.rect.centery -= 42
 
 	# read in the board.txt file as a 2D array
 	def readBoard(self):
@@ -97,6 +102,10 @@ class GameSpace:
 		while 1:
 			# clock tick
 			self.clock.tick(60)
+			self.red_ghost.move(self, 'red')
+			self.blue_ghost.move(self, 'blue')
+			self.pink_ghost.move(self, 'pink')
+			self.orange_ghost.move(self, 'orange')
 			# see if any new events have occurred
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
