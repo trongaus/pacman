@@ -79,8 +79,8 @@ class GameSpace:
 	# run this function until the start button is pressed
 	def start(self):
 		clicked = False
-		pygame.mixer.music.load("../sounds/pacman_beginning.wav")
-		pygame.mixer.music.play()
+		# pygame.mixer.music.load("../sounds/pacman_beginning.wav")
+		# pygame.mixer.music.play()
 		self.update()
 		# update the screen with the directions and start button
 		pygame.draw.rect(self.screen, (255,255,255), (494,140,100,30))
