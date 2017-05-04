@@ -73,7 +73,7 @@ class GameSpace:
 		self.update()
 		text = "LIVES: "
 		text += str(self.lives)
-		self.screen.blit(self.font.render(text, 1, (255,255,255)), (500, 100))
+		self.screen.blit(self.font.render(text, 1, (255,255,255)), (456, 72))
 		pygame.display.update()	
 
 	# run this function until the start button is pressed
