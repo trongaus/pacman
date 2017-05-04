@@ -20,7 +20,11 @@ class Player1(pygame.sprite.Sprite):
 
 	def update(self, gs):
 		_new = self.rect.move(self.movepos)
-		if gs.board[int(_new.centery/self.speed)][int(_new.centerx/self.speed)] == '1':
+		x = int(_new.centerx/self.speed)
+		y = int(_new.centery/self.speed)
+		if gs.board[y][x] == '1':
+			gs.travelled[y][x] = '0'
+			gs.screen.blit(gs.black_square, (x*self.speed, y*self.speed))
 			self.rect = _new
 			pygame.event.pump()
 

@@ -27,7 +27,9 @@ class Ghost(pygame.sprite.Sprite):
 
 	def update(self, gs):
 		_new = self.rect.move(self.movepos)
-		if gs.board[int(_new.centery/self.speed)][int(_new.centerx/self.speed)] == '1':
+		x = int(_new.centerx/self.speed)
+		y = int(_new.centery/self.speed)
+		if gs.board[y][x] == '1':
 			self.rect = _new
 			pygame.event.pump()
 
@@ -47,7 +49,7 @@ class Ghost(pygame.sprite.Sprite):
 		# check old direction
 		# if already moving L/R, continue on path until junction
 		# then make a new decision
-		if self.switchcount == 30:
+		if self.switchcount == 360:
 			if self.dir == 0:
 				self.dir = 1
 			elif self.dir == 1:
@@ -86,13 +88,13 @@ class Ghost(pygame.sprite.Sprite):
 		try: 
 			if gs.board[int(self.rect.centery/self.speed)][int(self.rect.centerx/self.speed)] == '1':
 				if direction == 'left':
-					self.movepos[0] = self.movepos[0] - self.speed
+					self.movepos[0] = self.movepos[0] - self.speed/4
 				elif direction == 'right':
-					self.movepos[0] = self.movepos[0] + self.speed
+					self.movepos[0] = self.movepos[0] + self.speed/4
 				elif direction == 'up':
-					self.movepos[1] = self.movepos[1] - self.speed
+					self.movepos[1] = self.movepos[1] - self.speed/4
 				elif direction == 'down':
-					self.movepos[1] = self.movepos[1] + self.speed
+					self.movepos[1] = self.movepos[1] + self.speed/4
 				self.update(gs)
 				self.refresh(gs)
 		except:
