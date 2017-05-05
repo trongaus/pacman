@@ -23,7 +23,7 @@ class Player1(pygame.sprite.Sprite):
 		x = int(_new.centerx/self.speed)
 		y = int(_new.centery/self.speed)
 		if gs.board[y][x] == '1':
-			gs.travelled[y][x] = '0'
+			gs.travelled[y][x] = '2'
 			gs.screen.blit(gs.black_square, (x*self.speed, y*self.speed))
 			self.rect = _new
 			pygame.event.pump()

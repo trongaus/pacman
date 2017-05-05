@@ -4,8 +4,6 @@
 import sys, pygame
 import Player1 as p1
 import Ghost as gh
-from twisted.internet.task import LoopingCall
-from twisted.internet import reactor
 
 class GameSpace:
 
@@ -55,24 +53,37 @@ class GameSpace:
 
 	# read in the dots.txt file as a 2D array
 	def readTravelled(self):
-		with open('board.txt') as file:
+		with open('dots.txt') as file:
 			self.travelled = [[digit for digit in line.split()] for line in file]
-
 
 	# blit all changes to the screen
 	def update(self):
 		self.screen.fill(self.black)
 		self.screen.blit(self.image, self.rect)
 		self.screen.blit(self.logo, self.logorect)
+		self.coverDots()
 		self.screen.blit(self.player1.image, self.player1.rect)
 		self.screen.blit(self.red_ghost.image, self.red_ghost.rect)
 		self.screen.blit(self.blue_ghost.image, self.blue_ghost.rect)
 		self.screen.blit(self.pink_ghost.image, self.pink_ghost.rect)
 		self.screen.blit(self.orange_ghost.image, self.orange_ghost.rect)
 
+	# cover the necessary dots
+	def coverDots(self):
+		i=0
+		j=0
+		for row in self.travelled:
+			i = i + 1
+			for col in row:
+				j = j + 1
+				if col == '2':
+					self.screen.blit(self.black_square, (j*self.player1.speed-(2*(self.player1.speed)),i*self.player1.speed-(2*(self.player1.speed))))
+			j = 0
+
 	# function specific to updates made during gameplay
 	def ingameUpdate(self):
 		self.update()
+		# blit black over the dots we have covered
 		text = "LIVES: "
 		text += str(self.lives)
 		self.screen.blit(self.font.render(text, 1, (255,255,255)), (456, 72))
@@ -139,13 +150,24 @@ class GameSpace:
 						self.player1.move(self, 'up')
 					elif event.key == pygame.K_DOWN:
 						self.player1.move(self, 'down')
+			# check to see if we have collided with a ghost
 			if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
 				self.lives -= 1
 				self.reset()
-
+			# check to see if we have won
+			if self.checkWin() == True:
+				self.gameWin()
 			# update the screen
 			self.ingameUpdate()
 			pygame.display.flip()
+
+	# function to iterate through the travelled board and determine if the player has won
+	def checkWin(self):
+		for row in self.travelled:
+			for col in row:
+				if col == '1':
+					return False
+		return True
 
 	# function to reset the board after a life is lost
 	def reset(self):
@@ -169,10 +191,19 @@ class GameSpace:
 		else:
 			self.gameover()
 
-	# function to end the game cleanly
+	# function to end the game cleanly upon a loss
 	def gameover(self):
 		self.screen.fill(self.black)
 		text = "GAME OVER"
+		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
+		pygame.display.update()	
+		pygame.time.wait(5000)
+		sys.exit()
+
+	# function to end the game cleanly upon a win
+	def gameWin(self):
+		self.screen.fill(self.black)
+		text = "YOU WIN!"
 		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
 		pygame.display.update()	
 		pygame.time.wait(5000)
