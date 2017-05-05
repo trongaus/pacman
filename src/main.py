@@ -163,11 +163,19 @@ class GameSpace:
 
 	# function to iterate through the travelled board and determine if the player has won
 	def checkWin(self):
+		print("ENTERED")
+		i=0
+		j=0
+		x = True
 		for row in self.travelled:
+			i = i + 1
 			for col in row:
+				j = j + 1
 				if col == '1':
-					return False
-		return True
+					print(i,j)
+					x = False
+			j = 0
+		return x
 
 	# function to reset the board after a life is lost
 	def reset(self):
