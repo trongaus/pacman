@@ -3,6 +3,7 @@
 
 import sys, pygame
 from random import randint
+import Player1 as p1
 
 class Ghost(pygame.sprite.Sprite):
 
@@ -17,9 +18,10 @@ class Ghost(pygame.sprite.Sprite):
 		self.rect.centerx = gs.rect.centerx
 		self.rect.centery = gs.rect.centery - 20
 		self.dirlist = ['left', 'right', 'up', 'down']
-		self.dir = 0;
+		self.dir = ;
 		self.speed = 8;
 		self.switchcount = 0;
+		self.player1 = p1.Player1(self)
 		self.refresh(gs)
 
 	def refresh(self, gs):
@@ -35,8 +37,8 @@ class Ghost(pygame.sprite.Sprite):
 
 	# function to semi-randomly change the directions of the ghosts
 	def changeDir(self, gs):
-		self.switchcount += 1
-		olddir = self.dir
+		#self.switchcount += 1
+		#olddir = self.dir
 		currpos = (int(self.rect.centerx/self.speed),int(self.rect.centery/self.speed))
 		upx = int(self.rect.centerx/self.speed)
 		upy = int(self.rect.centery/self.speed)-1
@@ -49,7 +51,7 @@ class Ghost(pygame.sprite.Sprite):
 		# check old direction
 		# if already moving L/R, continue on path until junction
 		# then make a new decision
-		if self.switchcount == 360:
+		if self.switchcount == 100:
 			if self.dir == 0:
 				self.dir = 1
 			elif self.dir == 1:
@@ -62,10 +64,16 @@ class Ghost(pygame.sprite.Sprite):
 		else:
 			if self.dir == 0 or self.dir == 1:
 				if gs.board[upy][upx] == '1' or gs.board[downy][downx] == '1':
+					#if self.player1.movepos[1] > movepos
 					self.dir = randint(0,3)
 			if self.dir == 2 or self.dir == 3:
 				if gs.board[lefty][leftx] == '1' or gs.board[righty][rightx] == '1':
 					self.dir = randint(0,3)
+		'''_new = self.rect.move(self.movepos)
+		x = int(_new.centerx/self.speed)
+		y = int(_new.centery/self.speed)
+		if self.dir == 1 and gs.board[y]'''
+
 
 	def move(self, gs, color):
 		# start by updating the image regardless of if there's a barrier

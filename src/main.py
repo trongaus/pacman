@@ -130,6 +130,8 @@ class GameSpace:
 		# need to figure out how to add in the proper sound effects
 		#pygame.mixer.music.load(self.sound)
 		#pygame.mixer.music.play(-1)
+		moveDir = ''
+		queue = 0
 		while 1:
 			# clock tick
 			self.clock.tick(60)
@@ -137,19 +139,49 @@ class GameSpace:
 			self.blue_ghost.move(self, 'blue')
 			self.pink_ghost.move(self, 'pink')
 			self.orange_ghost.move(self, 'orange')
+			#prepare to check travelled
+			_new = self.player1.rect.move(self.player1.movepos)
+			x = int(_new.centerx/self.player1.speed)
+			y = int(_new.centery/self.player1.speed)
 			# see if any new events have occurred
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					sys.exit()
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_LEFT:
-						self.player1.move(self, 'left')
+						if self.board[y][x - 1] == '1':
+							moveDir = 'left'
+							queue = 1
+						else:
+							queue = 1
 					elif event.key == pygame.K_RIGHT:
-						self.player1.move(self, 'right')
+						if self.board[y][x + 1] == '1':
+							moveDir = 'right'
+							queue = 2
+						else:
+							queue = 2
 					elif event.key == pygame.K_UP:
-						self.player1.move(self, 'up')
+						if self.board[y - 1][x] == '1':
+							moveDir = 'up'
+							queue = 3
+						else:
+							queue = 3
 					elif event.key == pygame.K_DOWN:
-						self.player1.move(self, 'down')
+						if self.board[y + 1][x] == '1':
+							moveDir = 'down'
+							queue = 4
+						else:
+							queue = 4
+			if queue == 1 and self.board[y][x - 1] == '1':
+				moveDir = 'left'
+			elif queue == 2 and self.board[y][x + 1] == '1':
+				moveDir = 'right'
+			elif queue == 3 and self.board[y - 1][x] == '1':
+				moveDir = 'up'
+			elif queue == 4 and self.board[y + 1][x] == '1':
+				moveDir = 'down'
+			self.player1.move(self, moveDir)
+			self.ingameUpdate()
 			# check to see if we have collided with a ghost
 			if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
 				self.lives -= 1
@@ -158,12 +190,11 @@ class GameSpace:
 			if self.checkWin() == True:
 				self.gameWin()
 			# update the screen
-			self.ingameUpdate()
 			pygame.display.flip()
 
 	# function to iterate through the travelled board and determine if the player has won
 	def checkWin(self):
-		print("ENTERED")
+		#print("ENTERED")
 		i=0
 		j=0
 		x = True
@@ -172,7 +203,7 @@ class GameSpace:
 			for col in row:
 				j = j + 1
 				if col == '1':
-					print(i,j)
+					#print(i,j)
 					x = False
 			j = 0
 		return x
