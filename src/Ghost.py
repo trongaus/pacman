@@ -127,6 +127,12 @@ class Ghost(pygame.sprite.Sprite):
 		elif direction == 'down':
 			img += '-down.png'
 			self.image = pygame.transform.scale2x(pygame.image.load(img))
+		if int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 3:
+			self.rect.centerx = 424
+			direction = 'left'
+		elif int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 53:
+			self.rect.centerx = 24
+			direction = 'right'
 		try: 
 			if gs.board[int(self.rect.centery/self.speed)][int(self.rect.centerx/self.speed)] == '1':
 				if direction == 'left':

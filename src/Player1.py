@@ -51,12 +51,12 @@ class Player1(pygame.sprite.Sprite):
 		elif direction == 'down':
 			self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-down-closed.png"))
 		# then check the board of 0s and 1s - if its a 1, there's a path so you can take it
-		'''if int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 3:
-			self.rect.move(self.movepos).centerx = 432
+		if int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 3:
+			self.rect.centerx = 424
 			direction = 'left'
 		elif int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 53:
-			self.rect.move(self.movepos).centery = 16
-			direction = 'right'''
+			self.rect.centerx = 24
+			direction = 'right'
 		try: 
 			if gs.board[int(self.rect.centery/self.speed)][int(self.rect.centerx/self.speed)] == '1':
 				if direction == 'left':
