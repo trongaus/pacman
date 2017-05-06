@@ -196,29 +196,41 @@ class GameSpace:
 			self.player1.rect.centery = self.rect.centery + 128
 			pygame.time.wait(1000)
 		else:
-			self.gameover()
+			self.gameover("YOU LOSE!")
 		pygame.mixer.music.load(self.sound)
 		pygame.mixer.music.play(-1)
 
 	# function to end the game cleanly upon a loss
-	def gameover(self):
+	def gameover(self, outcome):
+		if outcome == "YOU WON!":
+			pygame.mixer.music.load("../sounds/ta-da.wav")
+			pygame.mixer.music.play()
 		self.screen.fill(self.black)
-		text = "GAME OVER"
-		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
+		pygame.draw.rect(self.screen, (255,255,255), (self.width/2-40, self.height/2,100,30))
+		pygame.draw.rect(self.screen, (255,255,255), (self.width/2-40, self.height/2+50,100,30))
+		text = outcome
+		text2 = " Play again?"
+		text3 = "1 PLAYER"
+		text4 = "2 PLAYER"
+		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2-60))
+		self.screen.blit(self.font.render(text2, 1, (255,255,255)), (self.width/2-20, self.height/2-30))
+		self.screen.blit(self.font.render(text3, 1, (0,0,0)), (self.width/2-15, self.height/2+10))
+		self.screen.blit(self.font.render(text4, 1, (0,0,0)), (self.width/2-15, self.height/2+60))
 		pygame.display.update()	
-		pygame.time.wait(4000)
-		sys.exit()
+		clicked = False
+		while not clicked:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					sys.exit()
+				if event.type == pygame.MOUSEBUTTONDOWN:
+					pos = pygame.mouse.get_pos()
+					# determine if user clicked w/in the range of the start button
+					if pos[0] >= self.width/2-40 and pos[0] <= self.width/2+60:
+						if pos[1] >= self.height/2 and pos[1] <= self.height/2+30:
+							clicked = True
+		self.__init__()
+		self.main()
 
-	# function to end the game cleanly upon a win
-	def gameWin(self):
-		pygame.mixer.music.load('../sounds/ta-da.wav')
-		pygame.mixer.music.play()
-		self.screen.fill(self.black)
-		text = "YOU WIN!"
-		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
-		pygame.display.update()	
-		pygame.time.wait(4000)
-		sys.exit()
 
 	# main begins once we press the start button
 	def main(self):
@@ -288,7 +300,7 @@ class GameSpace:
 					self.reset()
 			# check to see if we have won
 			if self.checkWin() == True:
-				self.gameWin()
+				self.gameover("YOU WON!")
 			# update the screen
 			pygame.display.flip()
 
