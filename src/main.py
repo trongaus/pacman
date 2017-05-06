@@ -135,10 +135,10 @@ class GameSpace:
 		while 1:
 			# clock tick
 			self.clock.tick(60)
-			self.red_ghost.move(self, 'red')
-			self.blue_ghost.move(self, 'blue')
-			self.pink_ghost.move(self, 'pink')
-			self.orange_ghost.move(self, 'orange')
+			self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
+			self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
+			self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
+			self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
 			#prepare to check travelled
 			_new = self.player1.rect.move(self.player1.movepos)
 			x = int(_new.centerx/self.player1.speed)
