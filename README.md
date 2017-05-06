@@ -8,4 +8,4 @@ Running the game requres Python 3.0 or later and installation of the PyGame and 
 
 Credit for the sprites goes to Superjustinbros on https://www.spriters-resource.com 
 
-Credit for the sounds goes to http://www.classicgaming.cc/ and crysknife007 from https://www.youtube.com/watch?v=KL_FkWrFThA
+Credit for the sounds go to crysknife007 from https://www.youtube.com/watch?v=KL_FkWrFThA , http://soundbible.com/tags-winning.html and http://www.classicgaming.cc/
