@@ -11,7 +11,7 @@ class GameSpace:
 	def __init__(self):
 		pygame.init()
 		self.clock = pygame.time.Clock()
-		self.sound = "../sounds/pacman_chomp.wav"
+		self.sound = "../sounds/pacman_waka.wav"
 		self.size = self.width, self.height = 640, 496
 		self.black = 0,0,0
 		self.black_square = pygame.transform.scale2x(pygame.image.load("../img/black-square.png"))
@@ -21,6 +21,9 @@ class GameSpace:
 		self.travelled = [[]]
 		self.readTravelled()
 		self.lives = 3
+		self.ghost_mode = False
+		self.time_elapsed = 240
+		self.largeDots = [False, False, False, False]
 		pygame.display.set_caption('Pac-Man')
 		self.font = pygame.font.SysFont("liberationsans", 15)
 		self.logo = pygame.image.load("../img/logo.png")
@@ -89,28 +92,32 @@ class GameSpace:
 		self.screen.blit(self.font.render(text, 1, (255,255,255)), (456, 72))
 		pygame.display.update()	
 
-	# run this function until the start button is pressed
+	# run this function until one of the start buttons are pressed
 	def start(self):
 		clicked = False
-		# pygame.mixer.music.load("../sounds/pacman_beginning.wav")
-		# pygame.mixer.music.play()
+		pygame.mixer.music.load("../sounds/pacman_beginning.wav")
+		pygame.mixer.music.play()
 		self.update()
 		# update the screen with the directions and start button
 		pygame.draw.rect(self.screen, (255,255,255), (494,140,100,30))
+		pygame.draw.rect(self.screen, (255,255,255), (494,180,100,30))
 		text1 = "Use the arrow keys to move,"
 		text2 = "eat all the dots and"
 		text3 = "avoid the ghosts."
-		text4 = "PLAY"
+		text4 = "1 PLAYER"
+		text5 = "2 PLAYER"
 		directions = self.font.render("DIRECTIONS:", 1, (255,255,255))
 		directions1 = self.font.render(text1, 1, (255,255,255))
 		directions2 = self.font.render(text2, 1, (255,255,255))
 		directions3 = self.font.render(text3, 1, (255,255,255))
 		button1 = self.font.render(text4, 1, (0,0,0))
+		button2 = self.font.render(text5, 1, (0,0,0))
 		self.screen.blit(directions, (500, 56))
 		self.screen.blit(directions1, (452, 72))
 		self.screen.blit(directions2, (452, 88))
 		self.screen.blit(directions3, (452, 104))
-		self.screen.blit(button1, (526, 144))
+		self.screen.blit(button1, (520, 144))
+		self.screen.blit(button2, (520, 184))
 		pygame.display.update()			
 		while not clicked:
 			for event in pygame.event.get():
@@ -124,12 +131,101 @@ class GameSpace:
 							clicked = True
 		self.main()
 
+	# function to check to see if we've run over a large dot
+	def checkLargeDot(self):
+		x = self.player1.rect.centerx
+		y = self.player1.rect.centery
+		# check to see if we have run over a dot that hasn't yet been run over
+		if (x, y) == (24, 376) and self.largeDots[0] == False:
+			self.ghost_mode = True
+			self.largeDots[0] = True
+			self.time_elapsed = 240
+		if (x, y) == (424, 376) and self.largeDots[1] == False: 
+			self.ghost_mode = True
+			self.largeDots[1] = True
+			self.time_elapsed = 240
+		if (x, y) == (24, 48) and self.largeDots[2] == False: 
+			self.ghost_mode = True
+			self.largeDots[2] = True
+			self.time_elapsed = 240
+		if (x, y) == (424, 48) and self.largeDots[3] == False:
+			self.ghost_mode = True
+			self.largeDots[3] = True 
+			self.time_elapsed = 240
+		# check to see if the time has elapsed for ghost mode
+		if self.time_elapsed <= 0:
+			self.ghost_mode = False
+			self.time_elapsed = 240
+		else:
+			self.time_elapsed = self.time_elapsed - 1
+
+	# function to iterate through the travelled board and determine if the player has won
+	def checkWin(self):
+		i=0
+		j=0
+		x = True
+		for row in self.travelled:
+			i = i + 1
+			for col in row:
+				j = j + 1
+				if col == '1':
+					x = False
+			j = 0
+		return x
+
+	# function to reset the board after a life is lost
+	def reset(self):
+		pygame.mixer.music.load("../sounds/pacman_death.wav")
+		pygame.mixer.music.play()
+		if self.lives > 0:
+			pygame.time.wait(1000)
+			self.ghost_mode = False
+			self.red_ghost = gh.Ghost(self,"ghost-red-up.png")
+			self.red_ghost.rect.centerx -= 60
+			self.red_ghost.rect.centery -= 42
+			self.blue_ghost = gh.Ghost(self, "ghost-blue-up.png")
+			self.blue_ghost.rect.centerx -= 20
+			self.blue_ghost.rect.centery -= 42
+			self.pink_ghost = gh.Ghost(self, "ghost-pink-up.png")
+			self.pink_ghost.rect.centerx += 20
+			self.pink_ghost.rect.centery -= 42
+			self.orange_ghost = gh.Ghost(self, "ghost-orange-up.png")
+			self.orange_ghost.rect.centerx += 60
+			self.orange_ghost.rect.centery -= 42
+			self.player1.rect.centerx = self.rect.centerx
+			self.player1.rect.centery = self.rect.centery + 128
+			pygame.time.wait(1000)
+		else:
+			self.gameover()
+		pygame.mixer.music.load(self.sound)
+		pygame.mixer.music.play(-1)
+
+	# function to end the game cleanly upon a loss
+	def gameover(self):
+		self.screen.fill(self.black)
+		text = "GAME OVER"
+		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
+		pygame.display.update()	
+		pygame.time.wait(4000)
+		sys.exit()
+
+	# function to end the game cleanly upon a win
+	def gameWin(self):
+		pygame.mixer.music.load('../sounds/ta-da.wav')
+		pygame.mixer.music.play()
+		self.screen.fill(self.black)
+		text = "YOU WIN!"
+		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
+		pygame.display.update()	
+		pygame.time.wait(4000)
+		sys.exit()
+
 	# main begins once we press the start button
 	def main(self):
 		pygame.key.set_repeat(1,100)
 		# need to figure out how to add in the proper sound effects
-		#pygame.mixer.music.load(self.sound)
-		#pygame.mixer.music.play(-1)
+		pygame.mixer.music.load(self.sound)
+		pygame.mixer.music.play(-1)
 		moveDir = ''
 		queue = 0
 		while 1:
@@ -139,7 +235,7 @@ class GameSpace:
 			self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
 			self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
 			self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
-			#prepare to check travelled
+			# prepare to check travelled
 			_new = self.player1.rect.move(self.player1.movepos)
 			x = int(_new.centerx/self.player1.speed)
 			y = int(_new.centery/self.player1.speed)
@@ -180,73 +276,21 @@ class GameSpace:
 				moveDir = 'up'
 			elif queue == 4 and self.board[y + 1][x] == '1':
 				moveDir = 'down'
+			# move the pac and update the changes to the screen
 			self.player1.move(self, moveDir)
 			self.ingameUpdate()
+			# check to see if we've run over a large dot
+			self.checkLargeDot()
 			# check to see if we have collided with a ghost
-			if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
-				self.lives -= 1
-				self.reset()
+			if self.ghost_mode == False:
+				if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
+					self.lives -= 1
+					self.reset()
 			# check to see if we have won
 			if self.checkWin() == True:
 				self.gameWin()
 			# update the screen
 			pygame.display.flip()
-
-	# function to iterate through the travelled board and determine if the player has won
-	def checkWin(self):
-		#print("ENTERED")
-		i=0
-		j=0
-		x = True
-		for row in self.travelled:
-			i = i + 1
-			for col in row:
-				j = j + 1
-				if col == '1':
-					#print(i,j)
-					x = False
-			j = 0
-		return x
-
-	# function to reset the board after a life is lost
-	def reset(self):
-		if self.lives > 0:
-			pygame.time.wait(1000)
-			self.red_ghost = gh.Ghost(self,"ghost-red-up.png")
-			self.red_ghost.rect.centerx -= 60
-			self.red_ghost.rect.centery -= 42
-			self.blue_ghost = gh.Ghost(self, "ghost-blue-up.png")
-			self.blue_ghost.rect.centerx -= 20
-			self.blue_ghost.rect.centery -= 42
-			self.pink_ghost = gh.Ghost(self, "ghost-pink-up.png")
-			self.pink_ghost.rect.centerx += 20
-			self.pink_ghost.rect.centery -= 42
-			self.orange_ghost = gh.Ghost(self, "ghost-orange-up.png")
-			self.orange_ghost.rect.centerx += 60
-			self.orange_ghost.rect.centery -= 42
-			self.player1.rect.centerx = self.rect.centerx
-			self.player1.rect.centery = self.rect.centery + 128
-			pygame.time.wait(1000)
-		else:
-			self.gameover()
-
-	# function to end the game cleanly upon a loss
-	def gameover(self):
-		self.screen.fill(self.black)
-		text = "GAME OVER"
-		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
-		pygame.display.update()	
-		pygame.time.wait(5000)
-		sys.exit()
-
-	# function to end the game cleanly upon a win
-	def gameWin(self):
-		self.screen.fill(self.black)
-		text = "YOU WIN!"
-		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2))
-		pygame.display.update()	
-		pygame.time.wait(5000)
-		sys.exit()
 
 # run main
 if __name__ == '__main__':

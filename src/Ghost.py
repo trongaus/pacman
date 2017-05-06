@@ -52,80 +52,76 @@ class Ghost(pygame.sprite.Sprite):
 		_new = self.rect.move(self.movepos)
 		x = int(_new.centerx/self.speed)
 		y = int(_new.centery/self.speed)
-		# check old direction
-		# if already moving L/R, continue on path until junction
-		# then make a new decision
-		if self.switchcount == 75:
-			if self.dir == 0:
-				self.dir = 1
-			elif self.dir == 1:
-				self.dir = 0
-			elif self.dir == 2:
-				self.dir = 3
-			elif self.dir == 3:
-				self.dir = 2
-			self.switchcount = 0
-		else:
-			if self.dir == 0 or self.dir == 1:
-				if gs.board[upy][upx] == '1' or gs.board[downy][downx] == '1':
-					try:
-						if gety > y and gs.board[downy][downx] == '1' and random == 4:
-							self.dir = 3
-						elif gety < y and gs.board[upy][upx] == '1' and random == 4:
-							self.dir = 2
-						elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
-							self.dir = 1
-						elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
-							self.dir = 0
-						elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
-							self.dir = 0
-						elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
-							self.dir = 1
-						elif gety < y and gs.board[upy][upx] == '1' and random == 5:
-							self.dir = 2
-						elif gety > y and gs.board[downy][downx] == '1' and random == 5:
-							self.dir = 3
-					except:
-						pass
-			if self.dir == 2 or self.dir == 3:
-				if gs.board[lefty][leftx] == '1' or gs.board[righty][rightx] == '1':
-					try:
-						if gety > y and gs.board[downy][downx] == '1' and random == 4:
-							self.dir = 3
-						elif gety < y and gs.board[upy][upx] == '1' and random == 4:
-							self.dir = 2
-						elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
-							self.dir = 1
-						elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
-							self.dir = 0
-						elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
-							self.dir = 0
-						elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
-							self.dir = 1
-						elif gety < y and gs.board[upy][upx] == '1' and random == 5:
-							self.dir = 2
-						elif gety > y and gs.board[downy][downx] == '1' and random == 5:
-							self.dir = 3
-					except:
-						pass
+		if self.dir == 0 or self.dir == 1:
+			if gs.board[upy][upx] == '1' or gs.board[downy][downx] == '1':
+				try:
+					if gety > y and gs.board[downy][downx] == '1' and random == 4:
+						self.dir = 3
+					elif gety < y and gs.board[upy][upx] == '1' and random == 4:
+						self.dir = 2
+					elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
+						self.dir = 1
+					elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
+						self.dir = 0
+					elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
+						self.dir = 0
+					elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
+						self.dir = 1
+					elif gety < y and gs.board[upy][upx] == '1' and random == 5:
+						self.dir = 2
+					elif gety > y and gs.board[downy][downx] == '1' and random == 5:
+						self.dir = 3
+				except:
+					pass
+		if self.dir == 2 or self.dir == 3:
+			if gs.board[lefty][leftx] == '1' or gs.board[righty][rightx] == '1':
+				try:
+					if gety > y and gs.board[downy][downx] == '1' and random == 4:
+						self.dir = 3
+					elif gety < y and gs.board[upy][upx] == '1' and random == 4:
+						self.dir = 2
+					elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
+						self.dir = 1
+					elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
+						self.dir = 0
+					elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
+						self.dir = 0
+					elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
+						self.dir = 1
+					elif gety < y and gs.board[upy][upx] == '1' and random == 5:
+						self.dir = 2
+					elif gety > y and gs.board[downy][downx] == '1' and random == 5:
+						self.dir = 3
+				except:
+					pass
 
 	def move(self, gs, color, getx, gety):
 		# start by updating the image regardless of if there's a barrier
 		img = '../img/ghost-'
-		img += color
+		if gs.ghost_mode == False:
+			img += color
+		else:
+			if (gs.time_elapsed >= 10 and gs.time_elapsed <= 20) or (gs.time_elapsed >= 30 and gs.time_elapsed <= 40) or (gs.time_elapsed >= 50 and gs.time_elapsed <= 60):
+				img += 'white.png'
+			else:
+				img += 'dark-blue.png'
 		self.changeDir(gs, getx, gety)
 		direction = self.dirlist[self.dir]
 		if direction == 'left':
-			img += '-left.png'
+			if gs.ghost_mode == False:
+				img += '-left.png'
 			self.image = pygame.transform.scale2x(pygame.image.load(img))
 		elif direction == 'right':
-			img += '-right.png'
+			if gs.ghost_mode == False:
+				img += '-right.png'
 			self.image = pygame.transform.scale2x(pygame.image.load(img))
 		elif direction == 'up':
-			img += '-up.png'
+			if gs.ghost_mode == False:
+				img += '-up.png'
 			self.image = pygame.transform.scale2x(pygame.image.load(img))
 		elif direction == 'down':
-			img += '-down.png'
+			if gs.ghost_mode == False:
+				img += '-down.png'
 			self.image = pygame.transform.scale2x(pygame.image.load(img))
 		if int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 3:
 			self.rect.centerx = 424
