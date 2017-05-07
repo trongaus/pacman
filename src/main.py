@@ -23,6 +23,7 @@ class GameSpace:
 		self.lives = 3
 		self.ghost_mode = False
 		self.time_elapsed = 240
+		self.release_time = 719
 		self.largeDots = [False, False, False, False]
 		pygame.display.set_caption('Pac-Man')
 		self.font = pygame.font.SysFont("liberationsans", 15)
@@ -231,7 +232,6 @@ class GameSpace:
 		self.__init__()
 		self.main()
 
-
 	# main begins once we press the start button
 	def main(self):
 		pygame.key.set_repeat(1,100)
@@ -243,6 +243,7 @@ class GameSpace:
 		while 1:
 			# clock tick
 			self.clock.tick(60)
+			# move the ghosts
 			self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 			self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
 			self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))

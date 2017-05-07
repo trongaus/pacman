@@ -38,7 +38,6 @@ class Ghost(pygame.sprite.Sprite):
 	# function to semi-randomly change the directions of the ghosts
 	def changeDir(self, gs, getx, gety):
 		self.switchcount += 1
-		#olddir = self.dir
 		currpos = (int(self.rect.centerx/self.speed),int(self.rect.centery/self.speed))
 		upx = int(self.rect.centerx/self.speed)
 		upy = int(self.rect.centery/self.speed)-1
@@ -52,48 +51,62 @@ class Ghost(pygame.sprite.Sprite):
 		_new = self.rect.move(self.movepos)
 		x = int(_new.centerx/self.speed)
 		y = int(_new.centery/self.speed)
-		if self.dir == 0 or self.dir == 1:
-			if gs.board[upy][upx] == '1' or gs.board[downy][downx] == '1':
-				try:
-					if gety > y and gs.board[downy][downx] == '1' and random == 4:
-						self.dir = 3
-					elif gety < y and gs.board[upy][upx] == '1' and random == 4:
-						self.dir = 2
-					elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
-						self.dir = 1
-					elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
-						self.dir = 0
-					elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
-						self.dir = 0
-					elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
-						self.dir = 1
-					elif gety < y and gs.board[upy][upx] == '1' and random == 5:
-						self.dir = 2
-					elif gety > y and gs.board[downy][downx] == '1' and random == 5:
-						self.dir = 3
-				except:
-					pass
-		if self.dir == 2 or self.dir == 3:
-			if gs.board[lefty][leftx] == '1' or gs.board[righty][rightx] == '1':
-				try:
-					if gety > y and gs.board[downy][downx] == '1' and random == 4:
-						self.dir = 3
-					elif gety < y and gs.board[upy][upx] == '1' and random == 4:
-						self.dir = 2
-					elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
-						self.dir = 1
-					elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
-						self.dir = 0
-					elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
-						self.dir = 0
-					elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
-						self.dir = 1
-					elif gety < y and gs.board[upy][upx] == '1' and random == 5:
-						self.dir = 2
-					elif gety > y and gs.board[downy][downx] == '1' and random == 5:
-						self.dir = 3
-				except:
-					pass
+		# check old direction
+		# if already moving L/R, continue on path until junction
+		# then make a new decision
+		if self.switchcount == 75:
+			if self.dir == 0:
+				self.dir = 1
+			elif self.dir == 1:
+				self.dir = 0
+			elif self.dir == 2:
+				self.dir = 3
+			elif self.dir == 3:
+				self.dir = 2
+			self.switchcount = 0
+		else:
+			if self.dir == 0 or self.dir == 1:
+				if gs.board[upy][upx] == '1' or gs.board[downy][downx] == '1':
+					try:
+						if gety > y and gs.board[downy][downx] == '1' and random == 4:
+							self.dir = 3
+						elif gety < y and gs.board[upy][upx] == '1' and random == 4:
+							self.dir = 2
+						elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
+							self.dir = 1
+						elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
+							self.dir = 0
+						elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
+							self.dir = 0
+						elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
+							self.dir = 1
+						elif gety < y and gs.board[upy][upx] == '1' and random == 5:
+							self.dir = 2
+						elif gety > y and gs.board[downy][downx] == '1' and random == 5:
+							self.dir = 3
+					except:
+						pass
+			if self.dir == 2 or self.dir == 3:
+				if gs.board[lefty][leftx] == '1' or gs.board[righty][rightx] == '1':
+					try:
+						if gety > y and gs.board[downy][downx] == '1' and random == 4:
+							self.dir = 3
+						elif gety < y and gs.board[upy][upx] == '1' and random == 4:
+							self.dir = 2
+						elif getx > x and gs.board[righty][rightx] == '1' and random == 4:
+							self.dir = 1
+						elif getx < x and gs.board[lefty][leftx] == '1' and random == 4:
+							self.dir = 0
+						elif getx < x and gs.board[lefty][leftx] == '1' and random == 5:
+							self.dir = 0
+						elif getx > x and gs.board[righty][rightx] == '1' and random == 5:
+							self.dir = 1
+						elif gety < y and gs.board[upy][upx] == '1' and random == 5:
+							self.dir = 2
+						elif gety > y and gs.board[downy][downx] == '1' and random == 5:
+							self.dir = 3
+					except:
+						pass
 
 	def move(self, gs, color, getx, gety):
 		# start by updating the image regardless of if there's a barrier
