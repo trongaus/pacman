@@ -12,7 +12,7 @@ from twisted.internet.defer import DeferredQueue
 class CommandConnection(Protocol):
 
     def connectionMade(self):
-        print "work command connection made!!"
+        print("work command connection made!!")
 
     def dataReceived(self, data):
         if data == "start data connection":
@@ -30,7 +30,7 @@ class CommandFactory(ClientFactory):
 class DataConnection(Protocol):
 
     def connectionMade(self):
-        print "work data connection made!!"
+        print("work data connection made!!")
 
     def dataReceived(self, data):
         pass
