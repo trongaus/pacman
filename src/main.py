@@ -397,7 +397,9 @@ class GameSpace:
 			moveDir = 'down'
 		# move the pac and update the changes to the screen
 		self.player1.move(self, moveDir)
+		print("here")
 		self.ingameUpdate()
+		print("now here")
 		# check to see if we've run over a large dot
 		self.checkLargeDot()
 		# check to see if we have collided with a ghost
