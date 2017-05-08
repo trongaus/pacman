@@ -359,8 +359,8 @@ class GameSpace:
 		x = int(_new.centerx/self.player1.speed)
 		y = int(_new.centery/self.player1.speed)
 		# see if any new events have occurred
-		print("here")
 		for event in pygame.event.get():
+			print("here")
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if event.type == pygame.KEYDOWN:
