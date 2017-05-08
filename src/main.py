@@ -396,8 +396,8 @@ class GameSpace:
 		elif queue == 4 and self.board[y + 1][x] == '1':
 			moveDir = 'down'
 		# move the pac and update the changes to the screen
-		self.player1.move(self, moveDir)
 		print("here")
+		self.player1.move(self, moveDir)
 		self.ingameUpdate()
 		print("now here")
 		# check to see if we've run over a large dot
