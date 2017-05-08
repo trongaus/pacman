@@ -4,6 +4,7 @@
 import sys, pygame
 import Player1 as p1
 import Ghost as gh
+from twisted.internet.task import LoopingCall
 
 class GameSpace:
 
