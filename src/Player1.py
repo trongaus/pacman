@@ -39,32 +39,32 @@ class Player1(pygame.sprite.Sprite):
 			pygame.event.pump()
 
 	# move the pacman piece and update the image depending on the direction
-	def move(self, gs, direction):
+	def move(self, gs):
 		# start by updating the image regardless of if there's a barrier
-		if direction == 'left':
+		if gs.moveDir == 'left':
 			self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-left-closed.png"))
-		elif direction == 'right':
+		elif gs.moveDir == 'right':
 			self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-right-closed.png"))
-		elif direction == 'up':
+		elif gs.moveDir == 'up':
 			self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-up-closed.png"))
-		elif direction == 'down':
+		elif gs.moveDir == 'down':
 			self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-down-closed.png"))
 		if int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 3:
 			self.rect.centerx = 424
-			direction = 'left'
+			gs.moveDir = 'left'
 		elif int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 53:
 			self.rect.centerx = 24
-			direction = 'right'
+			gs.moveDir = 'right'
 		# then check the board of 0s and 1s - if its a 1, there's a path so you can take it
 		try: 
 			if gs.board[int(self.rect.centery/self.speed)][int(self.rect.centerx/self.speed)] == '1':
-				if direction == 'left':
+				if gs.moveDir == 'left':
 					self.movepos[0] = self.movepos[0] - self.speed
-				elif direction == 'right':
+				elif gs.moveDir == 'right':
 					self.movepos[0] = self.movepos[0] + self.speed
-				elif direction == 'up':
+				elif gs.moveDir == 'up':
 					self.movepos[1] = self.movepos[1] - self.speed
-				elif direction == 'down':
+				elif gs.moveDir == 'down':
 					self.movepos[1] = self.movepos[1] + self.speed
 				self.update(gs)
 				self.refresh(gs)

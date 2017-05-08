@@ -25,6 +25,7 @@ class GameSpace:
 		self.readBoard()
 		self.travelled = [[]]
 		self.readTravelled()
+		self.moveDir = ''
 		self.lives = 3
 		self.queue = 0
 		self.ghost_mode = False
@@ -282,7 +283,6 @@ class GameSpace:
 			pygame.mixer.music.play(-1)
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
-		moveDir = ''
 		while 1:
 			# clock tick
 			self.clock.tick(60)
@@ -302,38 +302,38 @@ class GameSpace:
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_LEFT:
 						if self.board[y][x - 1] == '1':
-							moveDir = 'left'
+							self.moveDir = 'left'
 							self.queue = 1
 						else:
 							self.queue = 1
 					elif event.key == pygame.K_RIGHT:
 						if self.board[y][x + 1] == '1':
-							moveDir = 'right'
+							self.moveDir = 'right'
 							self.queue = 2
 						else:
 							self.queue = 2
 					elif event.key == pygame.K_UP:
 						if self.board[y - 1][x] == '1':
-							moveDir = 'up'
+							self.moveDir = 'up'
 							self.queue = 3
 						else:
 							self.queue = 3
 					elif event.key == pygame.K_DOWN:
 						if self.board[y + 1][x] == '1':
-							moveDir = 'down'
+							self.moveDir = 'down'
 							self.queue = 4
 						else:
 							self.queue = 4
 			if self.queue == 1 and self.board[y][x - 1] == '1':
-				moveDir = 'left'
+				self.moveDir = 'left'
 			elif self.queue == 2 and self.board[y][x + 1] == '1':
-				moveDir = 'right'
+				self.moveDir = 'right'
 			elif self.queue == 3 and self.board[y - 1][x] == '1':
-				moveDir = 'up'
+				self.moveDir = 'up'
 			elif self.queue == 4 and self.board[y + 1][x] == '1':
-				moveDir = 'down'
+				self.moveDir = 'down'
 			# move the pac and update the changes to the screen
-			self.player1.move(self, moveDir)
+			self.player1.move(self)
 			self.ingameUpdate()
 			# check to see if we've run over a large dot
 			self.checkLargeDot()
@@ -353,7 +353,6 @@ class GameSpace:
 		# clock tick
 		# self.clock.tick(60)
 		# move the ghosts
-		moveDir = ''
 		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
 		self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
@@ -365,42 +364,42 @@ class GameSpace:
 		# see if any new events have occurred
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				sys.exit()
+				twistedP1.reactor.stop()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					if self.board[y][x - 1] == '1':
-						moveDir = 'left'
+						self.moveDir = 'left'
 						self.queue = 1
 					else:
 						self.queue = 1
 				elif event.key == pygame.K_RIGHT:
 					if self.board[y][x + 1] == '1':
-						moveDir = 'right'
+						self.moveDir = 'right'
 						self.queue = 2
 					else:
 						self.queue = 2
 				elif event.key == pygame.K_UP:
 					if self.board[y - 1][x] == '1':
-						moveDir = 'up'
+						self.moveDir = 'up'
 						self.queue = 3
 					else:
 						self.queue = 3
 				elif event.key == pygame.K_DOWN:
 					if self.board[y + 1][x] == '1':
-						moveDir = 'down'
+						self.moveDir = 'down'
 						self.queue = 4
 					else:
 						self.queue = 4
 		if self.queue == 1 and self.board[y][x - 1] == '1':
-			moveDir = 'left'
+			self.moveDir = 'left'
 		elif self.queue == 2 and self.board[y][x + 1] == '1':
-			moveDir = 'right'
+			self.moveDir = 'right'
 		elif self.queue == 3 and self.board[y - 1][x] == '1':
-			moveDir = 'up'
+			self.moveDir = 'up'
 		elif self.queue == 4 and self.board[y + 1][x] == '1':
-			moveDir = 'down'
+			self.moveDir = 'down'
 		# move the pac and update the changes to the screen
-		self.player1.move(self, moveDir)
+		self.player1.move(self)
 		self.ingameUpdate()
 		# check to see if we've run over a large dot
 		self.checkLargeDot()
@@ -417,7 +416,6 @@ class GameSpace:
 
 	# main begins once we press the start button
 	def main2(self):
-		print("main 2")
 		pygame.key.set_repeat(1,100)
 		# need to figure out how to add in the proper sound effects
 		try:
