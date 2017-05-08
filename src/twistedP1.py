@@ -47,6 +47,6 @@ class DataFactory(Factory):
 		return self.myconn
 
 
-commfact = CommandFactory()
-reactor.listenTCP(40097, commfact)
-reactor.run()
+#commfact = CommandFactory()
+#reactor.listenTCP(40097, commfact)
+#reactor.run()

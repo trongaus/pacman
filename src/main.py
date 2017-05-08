@@ -6,6 +6,7 @@ import Player1 as p1
 import Ghost as gh
 try:
 	from twisted.internet.task import LoopingCall
+	import twistedP1
 except:
 	pass
 
@@ -352,8 +353,8 @@ class GameSpace:
 		# clock tick
 		# self.clock.tick(60)
 		# move the ghosts
-		print("entered loop function")
 		moveDir = ''
+		queue = 0
 		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
 		self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
@@ -391,14 +392,17 @@ class GameSpace:
 						queue = 4
 					else:
 						queue = 4
-		if queue == 1 and self.board[y][x - 1] == '1':
-			moveDir = 'left'
-		elif queue == 2 and self.board[y][x + 1] == '1':
-			moveDir = 'right'
-		elif queue == 3 and self.board[y - 1][x] == '1':
-			moveDir = 'up'
-		elif queue == 4 and self.board[y + 1][x] == '1':
-			moveDir = 'down'
+		try:
+			if queue == 1 and self.board[y][x - 1] == '1':
+				moveDir = 'left'
+			elif queue == 2 and self.board[y][x + 1] == '1':
+				moveDir = 'right'
+			elif queue == 3 and self.board[y - 1][x] == '1':
+				moveDir = 'up'
+			elif queue == 4 and self.board[y + 1][x] == '1':
+				moveDir = 'down'
+		except Exception as e:
+			print(e)
 		# move the pac and update the changes to the screen
 		self.player1.move(self, moveDir)
 		self.ingameUpdate()
@@ -431,8 +435,11 @@ class GameSpace:
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
 		try:
+			commfact = twistedP1.CommandFactory()
+			twistedP1.reactor.listenTCP(40097, commfact)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
+			twistedP1.reactor.run()
 		except Exception as e:
 			print(e)
 
