@@ -343,6 +343,72 @@ class GameSpace:
 			# update the screen
 			pygame.display.flip()
 
+	# function to hold the stuff in the while loop
+	def loopFunction(self):
+		# clock tick
+		# self.clock.tick(60)
+		# move the ghosts
+		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
+		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
+		self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
+		self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
+		# prepare to check travelled
+		_new = self.player1.rect.move(self.player1.movepos)
+		x = int(_new.centerx/self.player1.speed)
+		y = int(_new.centery/self.player1.speed)
+		# see if any new events have occurred
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				sys.exit()
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_LEFT:
+					if self.board[y][x - 1] == '1':
+						moveDir = 'left'
+						queue = 1
+					else:
+						queue = 1
+				elif event.key == pygame.K_RIGHT:
+					if self.board[y][x + 1] == '1':
+						moveDir = 'right'
+						queue = 2
+					else:
+						queue = 2
+				elif event.key == pygame.K_UP:
+					if self.board[y - 1][x] == '1':
+						moveDir = 'up'
+						queue = 3
+					else:
+						queue = 3
+				elif event.key == pygame.K_DOWN:
+					if self.board[y + 1][x] == '1':
+						moveDir = 'down'
+						queue = 4
+					else:
+						queue = 4
+		if queue == 1 and self.board[y][x - 1] == '1':
+			moveDir = 'left'
+		elif queue == 2 and self.board[y][x + 1] == '1':
+			moveDir = 'right'
+		elif queue == 3 and self.board[y - 1][x] == '1':
+			moveDir = 'up'
+		elif queue == 4 and self.board[y + 1][x] == '1':
+			moveDir = 'down'
+		# move the pac and update the changes to the screen
+		self.player1.move(self, moveDir)
+		self.ingameUpdate()
+		# check to see if we've run over a large dot
+		self.checkLargeDot()
+		# check to see if we have collided with a ghost
+		if self.ghost_mode == False:
+			if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
+				self.lives -= 1
+				self.reset()
+		# check to see if we have won
+		if self.checkWin() == True:
+			self.gameover("YOU WON!")
+		# update the screen
+		pygame.display.flip()
+
 	# main begins once we press the start button
 	def main2(self):
 		print("main 2")
@@ -358,70 +424,8 @@ class GameSpace:
 		# use LoopingCall(1/60) instead of while
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
-		while 1:
-			# clock tick
-			# self.clock.tick(60)
-			# move the ghosts
-			self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
-			self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
-			self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
-			self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
-			# prepare to check travelled
-			_new = self.player1.rect.move(self.player1.movepos)
-			x = int(_new.centerx/self.player1.speed)
-			y = int(_new.centery/self.player1.speed)
-			# see if any new events have occurred
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					sys.exit()
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_LEFT:
-						if self.board[y][x - 1] == '1':
-							moveDir = 'left'
-							queue = 1
-						else:
-							queue = 1
-					elif event.key == pygame.K_RIGHT:
-						if self.board[y][x + 1] == '1':
-							moveDir = 'right'
-							queue = 2
-						else:
-							queue = 2
-					elif event.key == pygame.K_UP:
-						if self.board[y - 1][x] == '1':
-							moveDir = 'up'
-							queue = 3
-						else:
-							queue = 3
-					elif event.key == pygame.K_DOWN:
-						if self.board[y + 1][x] == '1':
-							moveDir = 'down'
-							queue = 4
-						else:
-							queue = 4
-			if queue == 1 and self.board[y][x - 1] == '1':
-				moveDir = 'left'
-			elif queue == 2 and self.board[y][x + 1] == '1':
-				moveDir = 'right'
-			elif queue == 3 and self.board[y - 1][x] == '1':
-				moveDir = 'up'
-			elif queue == 4 and self.board[y + 1][x] == '1':
-				moveDir = 'down'
-			# move the pac and update the changes to the screen
-			self.player1.move(self, moveDir)
-			self.ingameUpdate()
-			# check to see if we've run over a large dot
-			self.checkLargeDot()
-			# check to see if we have collided with a ghost
-			if self.ghost_mode == False:
-				if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
-					self.lives -= 1
-					self.reset()
-			# check to see if we have won
-			if self.checkWin() == True:
-				self.gameover("YOU WON!")
-			# update the screen
-			pygame.display.flip()
+		lc = LoopingCall(loopFunction)
+		lc.start(1/60)
 
 # run main
 if __name__ == '__main__':
