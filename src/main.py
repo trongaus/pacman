@@ -425,8 +425,11 @@ class GameSpace:
 		# use LoopingCall(1/60) instead of while
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
-		lc = LoopingCall(self.loopFunction)
-		lc.start(1/60)
+		try:
+			lc = LoopingCall(self.loopFunction)
+			lc.start(1/60)
+		except Exception as e:
+			print(e)
 
 # run main
 if __name__ == '__main__':
