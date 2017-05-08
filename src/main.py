@@ -26,6 +26,7 @@ class GameSpace:
 		self.travelled = [[]]
 		self.readTravelled()
 		self.lives = 3
+		self.queue = 0
 		self.ghost_mode = False
 		self.time_elapsed = 240
 		self.release_time = 719
@@ -282,7 +283,6 @@ class GameSpace:
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
 		moveDir = ''
-		queue = 0
 		while 1:
 			# clock tick
 			self.clock.tick(60)
@@ -303,34 +303,34 @@ class GameSpace:
 					if event.key == pygame.K_LEFT:
 						if self.board[y][x - 1] == '1':
 							moveDir = 'left'
-							queue = 1
+							self.queue = 1
 						else:
-							queue = 1
+							self.queue = 1
 					elif event.key == pygame.K_RIGHT:
 						if self.board[y][x + 1] == '1':
 							moveDir = 'right'
-							queue = 2
+							self.queue = 2
 						else:
-							queue = 2
+							self.queue = 2
 					elif event.key == pygame.K_UP:
 						if self.board[y - 1][x] == '1':
 							moveDir = 'up'
-							queue = 3
+							self.queue = 3
 						else:
-							queue = 3
+							self.queue = 3
 					elif event.key == pygame.K_DOWN:
 						if self.board[y + 1][x] == '1':
 							moveDir = 'down'
-							queue = 4
+							self.queue = 4
 						else:
-							queue = 4
-			if queue == 1 and self.board[y][x - 1] == '1':
+							self.queue = 4
+			if self.queue == 1 and self.board[y][x - 1] == '1':
 				moveDir = 'left'
-			elif queue == 2 and self.board[y][x + 1] == '1':
+			elif self.queue == 2 and self.board[y][x + 1] == '1':
 				moveDir = 'right'
-			elif queue == 3 and self.board[y - 1][x] == '1':
+			elif self.queue == 3 and self.board[y - 1][x] == '1':
 				moveDir = 'up'
-			elif queue == 4 and self.board[y + 1][x] == '1':
+			elif self.queue == 4 and self.board[y + 1][x] == '1':
 				moveDir = 'down'
 			# move the pac and update the changes to the screen
 			self.player1.move(self, moveDir)
@@ -354,7 +354,6 @@ class GameSpace:
 		# self.clock.tick(60)
 		# move the ghosts
 		moveDir = ''
-		queue = 0
 		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
 		self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
@@ -371,38 +370,35 @@ class GameSpace:
 				if event.key == pygame.K_LEFT:
 					if self.board[y][x - 1] == '1':
 						moveDir = 'left'
-						queue = 1
+						self.queue = 1
 					else:
-						queue = 1
+						self.queue = 1
 				elif event.key == pygame.K_RIGHT:
 					if self.board[y][x + 1] == '1':
 						moveDir = 'right'
-						queue = 2
+						self.queue = 2
 					else:
-						queue = 2
+						self.queue = 2
 				elif event.key == pygame.K_UP:
 					if self.board[y - 1][x] == '1':
 						moveDir = 'up'
-						queue = 3
+						self.queue = 3
 					else:
-						queue = 3
+						self.queue = 3
 				elif event.key == pygame.K_DOWN:
 					if self.board[y + 1][x] == '1':
 						moveDir = 'down'
-						queue = 4
+						self.queue = 4
 					else:
-						queue = 4
-		try:
-			if queue == 1 and self.board[y][x - 1] == '1':
-				moveDir = 'left'
-			elif queue == 2 and self.board[y][x + 1] == '1':
-				moveDir = 'right'
-			elif queue == 3 and self.board[y - 1][x] == '1':
-				moveDir = 'up'
-			elif queue == 4 and self.board[y + 1][x] == '1':
-				moveDir = 'down'
-		except Exception as e:
-			print(e)
+						self.queue = 4
+		if self.queue == 1 and self.board[y][x - 1] == '1':
+			moveDir = 'left'
+		elif self.queue == 2 and self.board[y][x + 1] == '1':
+			moveDir = 'right'
+		elif self.queue == 3 and self.board[y - 1][x] == '1':
+			moveDir = 'up'
+		elif self.queue == 4 and self.board[y + 1][x] == '1':
+			moveDir = 'down'
 		# move the pac and update the changes to the screen
 		self.player1.move(self, moveDir)
 		self.ingameUpdate()
@@ -430,13 +426,12 @@ class GameSpace:
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
 		moveDir = ''
-		queue = 0
 		# use LoopingCall(1/60) instead of while
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
 		try:
-			commfact = twistedP1.CommandFactory()
-			twistedP1.reactor.listenTCP(40097, commfact)
+			#commfact = twistedP1.CommandFactory()
+			#twistedP1.reactor.listenTCP(40097, commfact)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
 			twistedP1.reactor.run()
