@@ -95,9 +95,11 @@ class GameSpace:
 
 	# run this function until one of the start buttons are pressed
 	def start(self):
-		clicked = False
-		pygame.mixer.music.load("../sounds/pacman_beginning.wav")
-		pygame.mixer.music.play()
+		try:
+			pygame.mixer.music.load("../sounds/pacman_beginning.wav")
+			pygame.mixer.music.play()
+		except:
+			print("Error loading ../sounds/pacman_beginning.wav")
 		self.update()
 		# update the screen with the directions and start button
 		pygame.draw.rect(self.screen, (255,255,255), (494,140,100,30))
@@ -119,18 +121,31 @@ class GameSpace:
 		self.screen.blit(directions3, (452, 104))
 		self.screen.blit(button1, (520, 144))
 		self.screen.blit(button2, (520, 184))
-		pygame.display.update()			
+		pygame.display.update()
+		clicked = False
+		main1 = False
+		main2 = False				
 		while not clicked:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
-					# determine if user clicked w/in the range of the start button
+					# determine if user clicked w/in the range of the 1P start button
 					if pos[0] >= 494 and pos[0] <= 594:
 						if pos[1] >= 140 and pos[1] <= 170:
 							clicked = True
-		self.main()
+							main1 = True
+					# determine if user clicked w/in the range of the 2P start button
+						if pos[1] >= 180 and pos[1] <= 210:
+							clicked = True
+							main2 = True
+		if main1 == True:
+			self.main1()
+		elif main2 == True:
+			self.main2()
+		else:
+			pass
 
 	# function to check to see if we've run over a large dot
 	def checkLargeDot(self):
@@ -176,8 +191,11 @@ class GameSpace:
 
 	# function to reset the board after a life is lost
 	def reset(self):
-		pygame.mixer.music.load("../sounds/pacman_death.wav")
-		pygame.mixer.music.play()
+		try:
+			pygame.mixer.music.load("../sounds/pacman_death.wav")
+			pygame.mixer.music.play()
+		except:
+			print("Error loading ../sounds/pacman_death.wav")
 		if self.lives > 0:
 			pygame.time.wait(1000)
 			self.ghost_mode = False
@@ -204,8 +222,11 @@ class GameSpace:
 	# function to end the game cleanly upon a loss
 	def gameover(self, outcome):
 		if outcome == "YOU WON!":
-			pygame.mixer.music.load("../sounds/ta-da.wav")
-			pygame.mixer.music.play()
+			try:
+				pygame.mixer.music.load("../sounds/ta-da.wav")
+				pygame.mixer.music.play()
+			except:
+				print("Error loading ../sounds/ta-da.wav")
 		self.screen.fill(self.black)
 		pygame.draw.rect(self.screen, (255,255,255), (self.width/2-40, self.height/2,100,30))
 		pygame.draw.rect(self.screen, (255,255,255), (self.width/2-40, self.height/2+50,100,30))
@@ -219,30 +240,124 @@ class GameSpace:
 		self.screen.blit(self.font.render(text4, 1, (0,0,0)), (self.width/2-15, self.height/2+60))
 		pygame.display.update()	
 		clicked = False
+		main1 = False
+		main2 = False
 		while not clicked:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
-					# determine if user clicked w/in the range of the start button
+					# determine if user clicked w/in the range of either of the start buttons
 					if pos[0] >= self.width/2-40 and pos[0] <= self.width/2+60:
 						if pos[1] >= self.height/2 and pos[1] <= self.height/2+30:
 							clicked = True
+							main1 = True
+						if pos[1] >= self.height/2+50 and pos[1] <= self.height/2+80:
+							clicked = True
+							main2 = True
 		self.__init__()
-		self.main()
+		if main1 == True:
+			self.main1()
+		elif main2 == True:
+			self.main2()
+		else: 
+			pass
 
-	# main begins once we press the start button
-	def main(self):
+	# main1 begins once we press the player 1 start button
+	def main1(self):
 		pygame.key.set_repeat(1,100)
 		# need to figure out how to add in the proper sound effects
-		pygame.mixer.music.load(self.sound)
-		pygame.mixer.music.play(-1)
+		try:
+			pygame.mixer.music.load(self.sound)
+			pygame.mixer.music.play(-1)
+		except:
+			print("Error loading ../sounds/pacman_waka.wav")
 		moveDir = ''
 		queue = 0
 		while 1:
 			# clock tick
 			self.clock.tick(60)
+			# move the ghosts
+			self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
+			self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
+			self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
+			self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
+			# prepare to check travelled
+			_new = self.player1.rect.move(self.player1.movepos)
+			x = int(_new.centerx/self.player1.speed)
+			y = int(_new.centery/self.player1.speed)
+			# see if any new events have occurred
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					sys.exit()
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_LEFT:
+						if self.board[y][x - 1] == '1':
+							moveDir = 'left'
+							queue = 1
+						else:
+							queue = 1
+					elif event.key == pygame.K_RIGHT:
+						if self.board[y][x + 1] == '1':
+							moveDir = 'right'
+							queue = 2
+						else:
+							queue = 2
+					elif event.key == pygame.K_UP:
+						if self.board[y - 1][x] == '1':
+							moveDir = 'up'
+							queue = 3
+						else:
+							queue = 3
+					elif event.key == pygame.K_DOWN:
+						if self.board[y + 1][x] == '1':
+							moveDir = 'down'
+							queue = 4
+						else:
+							queue = 4
+			if queue == 1 and self.board[y][x - 1] == '1':
+				moveDir = 'left'
+			elif queue == 2 and self.board[y][x + 1] == '1':
+				moveDir = 'right'
+			elif queue == 3 and self.board[y - 1][x] == '1':
+				moveDir = 'up'
+			elif queue == 4 and self.board[y + 1][x] == '1':
+				moveDir = 'down'
+			# move the pac and update the changes to the screen
+			self.player1.move(self, moveDir)
+			self.ingameUpdate()
+			# check to see if we've run over a large dot
+			self.checkLargeDot()
+			# check to see if we have collided with a ghost
+			if self.ghost_mode == False:
+				if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
+					self.lives -= 1
+					self.reset()
+			# check to see if we have won
+			if self.checkWin() == True:
+				self.gameover("YOU WON!")
+			# update the screen
+			pygame.display.flip()
+
+	# main begins once we press the start button
+	def main2(self):
+		print("main 2")
+		pygame.key.set_repeat(1,100)
+		# need to figure out how to add in the proper sound effects
+		try:
+			pygame.mixer.music.load(self.sound)
+			pygame.mixer.music.play(-1)
+		except:
+			print("Error loading ../sounds/pacman_waka.wav")
+		moveDir = ''
+		queue = 0
+		# use LoopingCall(1/60) instead of while
+		# designate someone as the "master copy" -- hopefully it's close enough
+		# every second or so, send the client the current position  
+		while 1:
+			# clock tick
+			# self.clock.tick(60)
 			# move the ghosts
 			self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 			self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
