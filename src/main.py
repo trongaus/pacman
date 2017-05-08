@@ -216,8 +216,11 @@ class GameSpace:
 			pygame.time.wait(1000)
 		else:
 			self.gameover("YOU LOSE!")
-		pygame.mixer.music.load(self.sound)
-		pygame.mixer.music.play(-1)
+		try:
+			pygame.mixer.music.load(self.sound)
+			pygame.mixer.music.play(-1)
+		except:
+			print("Error loading ../sounds/pacman_waka.wav")
 
 	# function to end the game cleanly upon a loss
 	def gameover(self, outcome):
