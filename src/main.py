@@ -360,7 +360,6 @@ class GameSpace:
 		y = int(_new.centery/self.player1.speed)
 		# see if any new events have occurred
 		for event in pygame.event.get():
-			print("here")
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if event.type == pygame.KEYDOWN:
@@ -388,6 +387,7 @@ class GameSpace:
 						queue = 4
 					else:
 						queue = 4
+		print("here")
 		if queue == 1 and self.board[y][x - 1] == '1':
 			moveDir = 'left'
 		elif queue == 2 and self.board[y][x + 1] == '1':
