@@ -424,12 +424,11 @@ class GameSpace:
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
 		moveDir = ''
-		# use LoopingCall(1/60) instead of while
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
 		try:
-			#commfact = twistedP1.CommandFactory()
-			#twistedP1.reactor.listenTCP(40097, commfact)
+			datafact = twistedP1.DataFactory()
+			twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
 			twistedP1.reactor.run()
