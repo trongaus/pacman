@@ -21,7 +21,7 @@ class DataConnection(Protocol):
 
 	def sendData(self, data):
 		if self.connected:
-			self.transport.write(pickle.dumps(data))
+			transport.write(pickle.dumps(data))
 
 class DataFactory(ClientFactory):
    
