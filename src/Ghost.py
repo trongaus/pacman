@@ -3,7 +3,7 @@
 
 import sys, pygame
 from random import randint
-import Player1 as p1
+import Player as p
 
 class Ghost(pygame.sprite.Sprite):
 
@@ -21,7 +21,7 @@ class Ghost(pygame.sprite.Sprite):
 		self.dir = 0;
 		self.speed = 8;
 		self.switchcount = 0;
-		self.player1 = p1.Player1(self)
+		self.player1 = p.Player(self)
 		self.refresh(gs)
 
 	def refresh(self, gs):

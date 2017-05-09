@@ -355,13 +355,13 @@ class GameSpace():
 			pygame.display.flip()
 
 	# function to hold the stuff in the while loop
-	def loopFunction(self, datafact):
+	def loopFunction(self):
 
 		print("in the looping function")
 
 		# send the data
 		try:
-			datafact.myconn.sendData("this is data")
+			self.datafact.myconn.sendData(self)
 		except Exception as e:
 			print(e)
 
@@ -438,11 +438,11 @@ class GameSpace():
 			print("Error loading ../sounds/pacman_waka.wav")
 		
 		# create the data factory and make the connection
-		datafact = twistedP1.DataFactory()
-		twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
+		self.datafact = twistedP1.DataFactory()
+		twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, self.datafact)
 		
 		# start the looping call on the loop function 
-		lc = LoopingCall(self.loopFunction(datafact))
+		lc = LoopingCall(self.loopFunction)
 		lc.start(1/60)
 
 		# listen for data
