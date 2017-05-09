@@ -1,4 +1,4 @@
-# twistedP2.py (originally work)
+# twistedP1.py (originally work)
 # author: Taylor Rongaus
 # due May 1, 2017
 
@@ -10,15 +10,16 @@ from twisted.internet.defer import DeferredQueue
 
 class DataConnection(Protocol):
 
-    def connectionMade(self):
-        print("twistedP1 data connection made!!")
+	def connectionMade(self):
+		print("twistedP1 data connection made!!"
+		return True
 
-    def dataReceived(self, data):
-        print("got data")
-        d = pickle.loads(data)
+	def dataReceived(self, data):
+		print("twistedP1 got data")
+		d = pickle.loads(data)
 
-    def sendData(self, data):
-    	d = pickle.dumps(data)
+	def sendData(self, data):
+		self.transport.write(pickle.dumps(data))
 
 class DataFactory(ClientFactory):
    

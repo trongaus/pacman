@@ -432,22 +432,13 @@ class GameSpace():
 		try:
 			datafact = twistedP1.DataFactory()
 			twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
+			if datafact.myconn.connectionMade() == True:
+				datafact.myconn.sendData(self)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
 			twistedP1.reactor.run()
 		except Exception as e:
 			print(e)
-
-	def connectionMade(self):
-		print("main data connection made!!")
-
-	def dataReceived(self, data):
-		print("got data")
-		d = pickle.loads(data)
-
-	def sendData(self, data):
-		print("send data")
-		d = pickle.dumps(data)
 
 # run main
 if __name__ == '__main__':
