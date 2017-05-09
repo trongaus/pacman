@@ -7,6 +7,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
+from twisted.protocols.basic import LineReceiver
 
 class DataConnection(Protocol):
 

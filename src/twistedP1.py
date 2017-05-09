@@ -7,6 +7,7 @@ from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
+from twisted.protocols.basic import LineReceiver
 
 class DataConnection(Protocol):
 
@@ -21,7 +22,7 @@ class DataConnection(Protocol):
 
 	def sendData(self, data):
 		if self.connected:
-			transport.write(pickle.dumps(data))
+			self.transport.write(pickle.dumps(data))
 
 class DataFactory(ClientFactory):
    

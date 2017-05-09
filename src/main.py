@@ -11,6 +11,7 @@ try:
 	from twisted.internet import reactor
 	from twisted.internet.defer import DeferredQueue
 	from twisted.internet.task import LoopingCall
+	from twisted.protocols.basic import LineReceiver
 except:
 	pass
 
