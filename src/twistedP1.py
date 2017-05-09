@@ -11,7 +11,7 @@ from twisted.internet.defer import DeferredQueue
 class DataConnection(Protocol):
 
 	def connectionMade(self):
-		print("twistedP1 data connection made!!"
+		print("twistedP1 data connection made!!")
 		return True
 
 	def dataReceived(self, data):
@@ -23,10 +23,10 @@ class DataConnection(Protocol):
 
 class DataFactory(ClientFactory):
    
-    def __init__(self):
-        self.myconn = DataConnection()
-        print("twistedP1 data connection initialized")
+	def __init__(self):
+		self.myconn = DataConnection()
+		print("twistedP1 data connection initialized")
 
-    def buildProtocol(self, addr):
-        return self.myconn
+	def buildProtocol(self, addr):
+		return self.myconn
 
