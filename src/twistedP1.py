@@ -11,24 +11,28 @@ from twisted.protocols.basic import LineReceiver
 
 class DataConnection(Protocol):
 
+	def __init__(self):
+		self.connected = False
+
 	def connectionMade(self):
 		self.connected = True
 		print("twistedP1 data connection made!!")
-		return True
 
 	def dataReceived(self, data):
 		print("twistedP1 got data")
 		d = pickle.loads(data)
 
 	def sendData(self, data):
+		print("entered twistedP1 sendData function")
 		if self.connected:
-			self.transport.write(pickle.dumps(data))
+			print(type(self))
+			#self.transport.write(pickle.dumps(data))
 
 class DataFactory(ClientFactory):
    
 	def __init__(self):
 		self.myconn = DataConnection()
-		print("twistedP1 data connection initialized")
+		print("twistedP1 data factory initialized")
 
 	def buildProtocol(self, addr):
 		return self.myconn

@@ -430,16 +430,18 @@ class GameSpace():
 			print("Error loading ../sounds/pacman_waka.wav")
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
-		try:
-			datafact = twistedP1.DataFactory()
-			twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
-			if datafact.myconn.connectionMade() == True:
-				datafact.myconn.sendData(self)
-			lc = LoopingCall(self.loopFunction)
-			lc.start(1/60)
+		datafact = twistedP1.DataFactory()
+		twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)		
+		lc = LoopingCall(self.loopFunction)
+		lc.start(1/60)
+		print(datafact.myconn.connected)
+		while datafact.myconn.connected != True:
 			twistedP1.reactor.run()
-		except Exception as e:
-			print(e)
+		print(datafact.myconn.connected)
+		datafact.myconn.sendData(self)
+		#twistedP1.reactor.run()
+	#	except Exception as e:   
+	#		print(e)    
 
 # run main
 if __name__ == '__main__':
