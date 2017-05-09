@@ -26,7 +26,7 @@ class DataConnection(Protocol):
 		print("entered twistedP2 sendData function")
 		if self.connected:
 			print(type(self))
-			#self.transport.write(pickle.dumps(data))
+			self.transport.write(pickle.dumps(data))
 
 class DataFactory(Factory):
 	

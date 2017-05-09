@@ -3,6 +3,7 @@
 # due May 1, 2017
 
 import pickle
+import main
 from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
@@ -26,7 +27,7 @@ class DataConnection(Protocol):
 		print("entered twistedP1 sendData function")
 		if self.connected:
 			print(type(self))
-			#self.transport.write(pickle.dumps(data))
+			self.transport.write(pickle.dumps(data))
 
 class DataFactory(ClientFactory):
    

@@ -6,6 +6,7 @@ import Player1 as p1
 import Ghost as gh
 import twistedP1
 try:
+	from twisted.python import log
 	from twisted.internet.protocol import ClientFactory
 	from twisted.internet.protocol import Protocol
 	from twisted.internet import reactor
@@ -354,9 +355,16 @@ class GameSpace():
 			pygame.display.flip()
 
 	# function to hold the stuff in the while loop
-	def loopFunction(self):
-		# clock tick
-		# self.clock.tick(60)
+	def loopFunction(self, datafact):
+
+		print("in the looping function")
+
+		# send the data
+		try:
+			datafact.myconn.sendData("this is data")
+		except Exception as e:
+			print(e)
+
 		# move the ghosts
 		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
@@ -428,22 +436,22 @@ class GameSpace():
 			pygame.mixer.music.play(-1)
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
-		# designate someone as the "master copy" -- hopefully it's close enough
-		# every second or so, send the client the current position  
+		
+		# create the data factory and make the connection
 		datafact = twistedP1.DataFactory()
-		twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)		
-		lc = LoopingCall(self.loopFunction)
+		twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
+		
+		# start the looping call on the loop function 
+		lc = LoopingCall(self.loopFunction(datafact))
 		lc.start(1/60)
-		print(datafact.myconn.connected)
-		while datafact.myconn.connected != True:
-			twistedP1.reactor.run()
-		print(datafact.myconn.connected)
-		datafact.myconn.sendData(self)
-		#twistedP1.reactor.run()
-	#	except Exception as e:   
-	#		print(e)    
+
+		# listen for data
+		# reactor.run() should be the last line
+		twistedP1.reactor.run()
+
 
 # run main
 if __name__ == '__main__':
+	log.startLogging(sys.stdout)
 	gs = GameSpace()
 	gs.start()
