@@ -2,6 +2,7 @@
 # author: Taylor Rongaus
 # due May 1, 2017
 
+import pickle
 from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
@@ -14,6 +15,10 @@ class DataConnection(Protocol):
 
     def dataReceived(self, data):
         print("got data")
+        d = pickle.loads(data)
+
+    def sendData(self, data):
+    	d = pickle.dumps(data)
 
 class DataFactory(ClientFactory):
    

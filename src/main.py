@@ -1,16 +1,28 @@
 # main.py
 # authors: Taylor Rongaus & Henry Long
 
-import sys, pygame
+import sys, pygame, pickle
 import Player1 as p1
 import Ghost as gh
 try:
+	from twisted.internet.protocol import ClientFactory
+	from twisted.internet.protocol import Protocol
+	from twisted.internet import reactor
+	from twisted.internet.defer import DeferredQueue
 	from twisted.internet.task import LoopingCall
-	import twistedP1
 except:
 	pass
 
-class GameSpace:
+class DataFactory(ClientFactory):
+   
+	def __init__(self):
+		self.myconn = DataConnection()
+		print("main data connection initialized")
+
+	def buildProtocol(self, addr):
+		return self.myconn
+
+class GameSpace(Protocol):
 
 	# main gamsepace and sprites initialization
 	def __init__(self):
@@ -364,7 +376,7 @@ class GameSpace:
 		# see if any new events have occurred
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				twistedP1.reactor.stop()
+				self.reactor.stop()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					if self.board[y][x - 1] == '1':
@@ -423,17 +435,26 @@ class GameSpace:
 			pygame.mixer.music.play(-1)
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
-		moveDir = ''
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
 		try:
-			datafact = twistedP1.DataFactory()
-			twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
+			datafact = self.DataFactory()
+			self.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
-			twistedP1.reactor.run()
+			self.reactor.run()
 		except Exception as e:
 			print(e)
+
+	def connectionMade(self):
+		print("main data connection made!!")
+
+	def dataReceived(self, data):
+		print("got data")
+		# d = pickle.loads(data)
+
+	def sendData(self, data):
+		# d = pickle.dumps(data)
 
 # run main
 if __name__ == '__main__':
