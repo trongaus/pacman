@@ -438,7 +438,7 @@ class GameSpace(Protocol):
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
 		try:
-			datafact = self.DataFactory()
+			datafact = DataFactory()
 			self.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
@@ -451,10 +451,10 @@ class GameSpace(Protocol):
 
 	def dataReceived(self, data):
 		print("got data")
-		# d = pickle.loads(data)
+		d = pickle.loads(data)
 
 	def sendData(self, data):
-		# d = pickle.dumps(data)
+		d = pickle.dumps(data)
 
 # run main
 if __name__ == '__main__':
