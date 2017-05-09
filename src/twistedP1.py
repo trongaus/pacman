@@ -11,6 +11,7 @@ from twisted.internet.defer import DeferredQueue
 class DataConnection(Protocol):
 
 	def connectionMade(self):
+		self.connected = True
 		print("twistedP1 data connection made!!")
 		return True
 
@@ -19,7 +20,8 @@ class DataConnection(Protocol):
 		d = pickle.loads(data)
 
 	def sendData(self, data):
-		pickle.dumps(data)
+		if self.connected:
+			self.transport.write(pickle.dumps(data))
 
 class DataFactory(ClientFactory):
    
