@@ -19,7 +19,7 @@ class DataConnection(Protocol):
 		d = pickle.loads(data)
 
 	def sendData(self, data):
-		self.transport.write(pickle.dumps(data))
+		pickle.dumps(data)
 
 class DataFactory(ClientFactory):
    
