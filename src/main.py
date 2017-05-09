@@ -4,6 +4,7 @@
 import sys, pygame, pickle
 import Player1 as p1
 import Ghost as gh
+import twistedP1
 try:
 	from twisted.internet.protocol import ClientFactory
 	from twisted.internet.protocol import Protocol
@@ -13,16 +14,7 @@ try:
 except:
 	pass
 
-class DataFactory(ClientFactory):
-   
-	def __init__(self):
-		self.myconn = DataConnection()
-		print("main data connection initialized")
-
-	def buildProtocol(self, addr):
-		return self.myconn
-
-class GameSpace(Protocol):
+class GameSpace():
 
 	# main gamsepace and sprites initialization
 	def __init__(self):
@@ -438,11 +430,11 @@ class GameSpace(Protocol):
 		# designate someone as the "master copy" -- hopefully it's close enough
 		# every second or so, send the client the current position  
 		try:
-			datafact = DataFactory()
-			self.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
+			datafact = twistedP1.DataFactory()
+			twistedP1.reactor.connectTCP("ash.campus.nd.edu", 41097, datafact)
 			lc = LoopingCall(self.loopFunction)
 			lc.start(1/60)
-			self.reactor.run()
+			twistedP1.reactor.run()
 		except Exception as e:
 			print(e)
 
@@ -454,6 +446,7 @@ class GameSpace(Protocol):
 		d = pickle.loads(data)
 
 	def sendData(self, data):
+		print("send data")
 		d = pickle.dumps(data)
 
 # run main
