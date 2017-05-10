@@ -5,7 +5,7 @@
 # main.py
 # authors: Taylor Rongaus & Henry Long
 
-import sys, pygame, pickle
+import sys, pygame
 import Player as p
 import Ghost as gh
 try:
@@ -36,12 +36,13 @@ class GameSpace(Protocol):
 		self.readTravelled()
 		self.moveDir = ''
 		self.lives = 3
+		self.score = 0
 		self.queue = 0
 		self.ghost_mode = False
 		self.time_elapsed = 240
 		self.release_time = 719
 		self.largeDots = [False, False, False, False]
-		pygame.display.set_caption('Pac-Man')
+		pygame.display.set_caption('Pac-Man Player 2')
 		self.font = pygame.font.SysFont("liberationsans", 15)
 		self.logo = pygame.image.load("../img/logo.png")
 		self.logorect = self.logo.get_rect()
@@ -65,7 +66,10 @@ class GameSpace(Protocol):
 		self.orange_ghost = gh.Ghost(self, "ghost-orange-up.png")
 		self.orange_ghost.rect.centerx += 60
 		self.orange_ghost.rect.centery -= 42
-		self.connected = False
+		self.connected = 0
+		self.opponentScore = ''
+		self.opponentEnd = False
+		self.sendCount = 0
 
 	# read in the board.txt file as a 2D array
 	def readBoard(self):
@@ -102,12 +106,22 @@ class GameSpace(Protocol):
 			j = 0
 
 	# function specific to updates made during gameplay
-	def ingameUpdate(self):
+	def ingameUpdate(self, numPlayers):
 		self.update()
 		# blit black over the dots we have covered
 		text = "LIVES: "
 		text += str(self.lives)
+		text2 = "SCORE: "
+		text2 += str(self.score)
 		self.screen.blit(self.font.render(text, 1, (255,255,255)), (456, 72))
+		self.screen.blit(self.font.render(text2, 1, (255,255,255)), (456, 88))
+		if numPlayers == 2:
+			text3 = "OPPONENT SCORE: "
+			if self.opponentScore == 'Waiting for opponent...':
+				self.screen.blit(self.font.render(self.opponentScore, 1, (255,255,255)), (456, 120))
+			else:
+				text3 += str(self.opponentScore)
+			self.screen.blit(self.font.render(text3, 1, (255,255,255)), (456, 104))
 		pygame.display.update()	
 
 	# run this function until one of the start buttons are pressed
@@ -160,6 +174,7 @@ class GameSpace(Protocol):
 		if main1 == True:
 			self.main1()
 		elif main2 == True:
+			self.opponentScore = 'Waiting for opponent...'
 			self.main2()
 		else:
 			pass
@@ -207,7 +222,7 @@ class GameSpace(Protocol):
 		return x
 
 	# function to reset the board after a life is lost
-	def reset(self):
+	def reset(self, numPlayers):
 		try:
 			pygame.mixer.music.load("../sounds/pacman_death.wav")
 			pygame.mixer.music.play()
@@ -215,6 +230,7 @@ class GameSpace(Protocol):
 			print("Error loading ../sounds/pacman_death.wav")
 		if self.lives > 0:
 			pygame.time.wait(1000)
+			self.score = self.score - 100
 			self.ghost_mode = False
 			self.red_ghost = gh.Ghost(self,"ghost-red-up.png")
 			self.red_ghost.rect.centerx -= 60
@@ -232,7 +248,7 @@ class GameSpace(Protocol):
 			self.player1.rect.centery = self.rect.centery + 128
 			pygame.time.wait(1000)
 		else:
-			self.gameover("YOU LOSE!")
+			self.gameover("YOU LOSE!", numPlayers)
 		try:
 			pygame.mixer.music.load(self.sound)
 			pygame.mixer.music.play(-1)
@@ -240,7 +256,12 @@ class GameSpace(Protocol):
 			print("Error loading ../sounds/pacman_waka.wav")
 
 	# function to end the game cleanly upon a loss
-	def gameover(self, outcome):
+	def gameover(self, outcome, numPlayers):
+		if outcome == "YOU WON!":
+			if int(self.opponentScore) > self.score:
+				outcome = "YOU LOST! The opponent scored more points than you"
+			elif int(self.opponentScore) == self.score:
+				outcome = "YOU TIED! The opponent had the same score as you"
 		if outcome == "YOU WON!":
 			try:
 				pygame.mixer.music.load("../sounds/ta-da.wav")
@@ -265,7 +286,15 @@ class GameSpace(Protocol):
 		while not clicked:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
-					sys.exit()
+					if numPlayers == 1:
+						sys.exit()
+					else:
+						# i really don't know why this throws an error
+						try:
+							reactor.stop()
+						except Exception as e:
+							print(e)
+							sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
 					# determine if user clicked w/in the range of either of the start buttons
@@ -280,6 +309,7 @@ class GameSpace(Protocol):
 		if main1 == True:
 			self.main1()
 		elif main2 == True:
+			self.opponentScore = 'Waiting for opponent...'
 			self.main2()
 		else: 
 			pass
@@ -343,27 +373,32 @@ class GameSpace(Protocol):
 			elif self.queue == 4 and self.board[y + 1][x] == '1':
 				self.moveDir = 'down'
 			# move the pac and update the changes to the screen
-			self.player1.move(self)
-			self.ingameUpdate()
+			if self.player1.move(self) == True:
+				self.score = self.score + 10
+			self.ingameUpdate(1)
 			# check to see if we've run over a large dot
 			self.checkLargeDot()
 			# check to see if we have collided with a ghost
 			if self.ghost_mode == False:
 				if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
 					self.lives -= 1
-					self.reset()
+					self.reset(1)
 			# check to see if we have won
 			if self.checkWin() == True:
-				self.gameover("YOU WON!")
+				self.gameover("YOU WON!", 1)
 			# update the screen
 			pygame.display.flip()
 
 	# function to hold the stuff in the while loop
 	def loopFunction(self):
 
-		# move the ghosts based on data from P1
-		# somehow .........
-
+		self.sendCount += 1
+		# move the ghosts
+		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
+		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
+		self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
+		self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
+		
 		# prepare to check travelled
 		_new = self.player1.rect.move(self.player1.movepos)
 		x = int(_new.centerx/self.player1.speed)
@@ -406,65 +441,67 @@ class GameSpace(Protocol):
 		elif self.queue == 4 and self.board[y + 1][x] == '1':
 			self.moveDir = 'down'
 		# move the pac and update the changes to the screen
-		self.player1.move(self)
-		self.ingameUpdate()
+		if self.player1.move(self) == True:
+			self.score = self.score + 10
+		self.ingameUpdate(2)
 		# check to see if we've run over a large dot
 		self.checkLargeDot()
 		# check to see if we have collided with a ghost
 		if self.ghost_mode == False:
 			if (self.player1.rect.colliderect(self.red_ghost.rect) or self.player1.rect.colliderect(self.blue_ghost.rect)) or self.player1.rect.colliderect(self.pink_ghost.rect) or self.player1.rect.colliderect(self.orange_ghost.rect):
 				self.lives -= 1
-				self.reset()
-		# check to see if we have won
+				self.reset(2)
+		# check to see if we have won 
 		if self.checkWin() == True:
-			self.gameover("YOU WON!")
+			self.transport.write('end')
+			self.gameover("YOU WON!", 2)
+
+		# send over the player's score  
+		# use % to slow this down a bit
+		if self.sendCount % 2 == 0:
+			self.transport.write(str(self.score))
 		# update the screen
 		pygame.display.flip()
 
 	# main begins once we press the start button
 	def main2(self):
 		pygame.key.set_repeat(1,100)
-		# need to figure out how to add in the proper sound effects
 		try:
 			pygame.mixer.music.load(self.sound)
 			pygame.mixer.music.play(-1)
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
 		
-		# create a second instance of a player 
-		self.player2 = p.Player(self)
 		# create the data factory and make the connection
 		reactor.listenTCP(41097, DataFactory())
 
-		# start the looping call on the loop function
+		# start the looping call on the loop function 
+		self.screen.fill(self.black)
+		text = "Waiting for opponent..."
+		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-60, self.height/2))
+		pygame.display.update()
+		reactor.run()
+
+	# functions for the data connection 
+
+	def connectionMade(self):
+		self.transport.write(str(self.score))
 		lc = LoopingCall(self.loopFunction)
 		lc.start(1/60)
 
-		reactor.run()
-
-
-	# functions for the data connection
-
-	def connectionMade(self):
-		self.connected = True
-		print("twistedP2 data connection made!!")
-
 	def dataReceived(self, data):
-		print("twistedP2 got data")
-		d = pickle.loads(data)
-
-	def sendData(self, data):
-		print("entered twistedP2 sendData function")
-		if self.connected:
-			print(type(self))
-			self.transport.write(pickle.dumps(data))
+		if data != 'end':
+			if self.opponentScore != data:
+				self.opponentScore = data
+				self.ingameUpdate(2)
+		else:
+			self.opponentEnd = True
 
 
 class DataFactory(Factory):
 	
 	def __init__(self):
 		self.myconn = GameSpace()
-		print("twistedP2 data factory initialized")
 
 	def buildProtocol(self, addr):
 		return self.myconn
@@ -473,7 +510,7 @@ class DataFactory(Factory):
 
 # run main
 if __name__ == '__main__':
-	log.startLogging(sys.stdout)
+	#log.startLogging(sys.stdout)
 	gs = GameSpace()
 	gs.start()
 

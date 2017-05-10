@@ -5,7 +5,7 @@ import sys, pygame
 
 class Player(pygame.sprite.Sprite):
 
-	# initialize the pacman player sprite
+	# initialize the pacman player sprite 
 	def __init__(self, gs):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-left-closed.png"))
@@ -27,19 +27,24 @@ class Player(pygame.sprite.Sprite):
 		return self.y
 
 	def update(self, gs):
+		increaseScore = False
 		_new = self.rect.move(self.movepos)
 		x = int(_new.centerx/self.speed)
 		y = int(_new.centery/self.speed)
 		self.x = x
 		self.y = y
 		if gs.board[y][x] == '1':
+			if gs.travelled[y][x] == '1':
+				increaseScore = True
 			gs.travelled[y][x] = '2'
 			gs.screen.blit(gs.black_square, (x*self.speed, y*self.speed))
 			self.rect = _new
 			pygame.event.pump()
+		return increaseScore
 
 	# move the pacman piece and update the image depending on the direction
 	def move(self, gs):
+		increaseScore = False
 		# start by updating the image regardless of if there's a barrier
 		if gs.moveDir == 'left':
 			self.image = pygame.transform.scale2x(pygame.image.load("../img/pacman-left-closed.png"))
@@ -66,10 +71,11 @@ class Player(pygame.sprite.Sprite):
 					self.movepos[1] = self.movepos[1] - self.speed
 				elif gs.moveDir == 'down':
 					self.movepos[1] = self.movepos[1] + self.speed
-				self.update(gs)
+				increaseScore = self.update(gs)
 				self.refresh(gs)
 		except:
 			pass
+		return increaseScore
 		
 		
 		
