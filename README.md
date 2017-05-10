@@ -1,7 +1,8 @@
 # pacman
 an implementation of the Pac-Man arcade game using PyGame and Twisted 
 created by Taylor Rongaus (trongaus) & Henry Long (hlong2)
-for grading purposed: the most updated code is in the (trongaus) directory
+
+for grading purposes: the most updated code is in the (trongaus) directory
 
 ## notes:
 
