@@ -5,6 +5,9 @@ import sys, pygame
 from random import randint
 import Player as p
 
+# a class for the Ghost computer -- includes initialization of the sprite
+# and details on how the movements are generated and updated
+
 class Ghost(pygame.sprite.Sprite):
 
 	# initialize the ghost sprite
@@ -24,9 +27,11 @@ class Ghost(pygame.sprite.Sprite):
 		self.player1 = p.Player(self)
 		self.refresh(gs)
 
+	# refresh the movepos
 	def refresh(self, gs):
 		self.movepos = [0,0]
 
+	# actually make updates to the gamespace
 	def update(self, gs):
 		_new = self.rect.move(self.movepos)
 		x = int(_new.centerx/self.speed)
@@ -54,6 +59,8 @@ class Ghost(pygame.sprite.Sprite):
 		# check old direction
 		# if already moving L/R, continue on path until junction
 		# then make a new decision
+		# also make sure direction is flipped every 75 times or so
+		# for preventative maintenance
 		if self.switchcount == 75:
 			if self.dir == 0:
 				self.dir = 1
@@ -65,6 +72,8 @@ class Ghost(pygame.sprite.Sprite):
 				self.dir = 2
 			self.switchcount = 0
 		else:
+			# make some educated determinations based on the current direction and
+			# the randomly selected new direction of motion
 			if self.dir == 0 or self.dir == 1:
 				if gs.board[upy][upx] == '1' or gs.board[downy][downx] == '1':
 					try:
@@ -108,9 +117,10 @@ class Ghost(pygame.sprite.Sprite):
 					except:
 						pass
 
+	# function to control the movements of the ghosts
 	def move(self, gs, color, getx, gety):
-		# start by updating the image regardless of if there's a barrier
 		img = '../img/ghost-'
+		# check to see if we are in "ghost mode" and all images should be blue/white
 		if gs.ghost_mode == False:
 			img += color
 		else:
@@ -118,8 +128,11 @@ class Ghost(pygame.sprite.Sprite):
 				img += 'white.png'
 			else:
 				img += 'dark-blue.png'
+		# change the direction of the ghosts movement if necessary
 		self.changeDir(gs, getx, gety)
+		# get the new direction of movement
 		direction = self.dirlist[self.dir]
+		# update the ghost sprite image depending on new direction
 		if direction == 'left':
 			if gs.ghost_mode == False:
 				img += '-left.png'
@@ -136,6 +149,7 @@ class Ghost(pygame.sprite.Sprite):
 			if gs.ghost_mode == False:
 				img += '-down.png'
 			self.image = pygame.transform.scale2x(pygame.image.load(img))
+		# handle the case where we can run off the left and right edges of the board
 		if int(self.rect.centery/self.speed) == 29 and int(self.rect.centerx/self.speed) == 3:
 			self.rect.centerx = 424
 			direction = 'left'
@@ -143,6 +157,7 @@ class Ghost(pygame.sprite.Sprite):
 			self.rect.centerx = 24
 			direction = 'right'
 		try: 
+			# and if the path to the new point exists, update and refresh
 			if gs.board[int(self.rect.centery/self.speed)][int(self.rect.centerx/self.speed)] == '1':
 				if direction == 'left':
 					self.movepos[0] = self.movepos[0] - self.speed/2

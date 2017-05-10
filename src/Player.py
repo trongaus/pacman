@@ -3,6 +3,9 @@
 
 import sys, pygame
 
+# a class for the Pacman player -- includes initialization of the sprite
+# and details on how the movements are controlled and updated
+
 class Player(pygame.sprite.Sprite):
 
 	# initialize the pacman player sprite 
@@ -17,15 +20,18 @@ class Player(pygame.sprite.Sprite):
 		self.x = 28
 		self.y = 47
 
+	# reset the movepos
 	def refresh(self, gs):
 		self.movepos = [0,0]
 
+	# helper functions
 	def getx(self, gs):
 		return self.x
 
 	def gety(self, gs):
 		return self.y
 
+	# actually make the updates to the gamespace
 	def update(self, gs):
 		increaseScore = False
 		_new = self.rect.move(self.movepos)

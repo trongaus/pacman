@@ -1,9 +1,10 @@
-# twistedP1.py (originally work)
+# twistedP1.py
 # author: Taylor Rongaus
 # due May 1, 2017
 
-# main.py
-# authors: Taylor Rongaus & Henry Long
+# player1 of our two-player Pacman implementation
+# see the README for more details on the gameplay
+# P1 and P2 are almost indentical code except P1 is the client
 
 import sys, pygame
 import Player as p
@@ -13,12 +14,12 @@ try:
 	from twisted.internet.protocol import ClientFactory
 	from twisted.internet.protocol import Protocol
 	from twisted.internet import reactor
-	from twisted.internet.defer import DeferredQueue
 	from twisted.internet.task import LoopingCall
-	from twisted.protocols.basic import LineReceiver
 except:
 	pass
 
+# class for the overall gamespace -- inherit from Protocol
+# in order to make it function like a DataConnection class
 class GameSpace(Protocol):
 
 	# main gamsepace and sprites initialization
@@ -93,7 +94,7 @@ class GameSpace(Protocol):
 		self.screen.blit(self.pink_ghost.image, self.pink_ghost.rect)
 		self.screen.blit(self.orange_ghost.image, self.orange_ghost.rect)
 
-	# cover the necessary dots
+	# cover the necessary dots with black squares
 	def coverDots(self):
 		i=0
 		j=0
@@ -155,7 +156,8 @@ class GameSpace(Protocol):
 		pygame.display.update()
 		clicked = False
 		main1 = False
-		main2 = False				
+		main2 = False		
+		# run while a button has not been clicked to start gameplay		
 		while not clicked:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -184,6 +186,7 @@ class GameSpace(Protocol):
 		x = self.player1.rect.centerx
 		y = self.player1.rect.centery
 		# check to see if we have run over a dot that hasn't yet been run over
+		# if so, start "ghost mode"
 		if (x, y) == (24, 376) and self.largeDots[0] == False:
 			self.ghost_mode = True
 			self.largeDots[0] = True
@@ -248,6 +251,7 @@ class GameSpace(Protocol):
 			self.player1.rect.centery = self.rect.centery + 128
 			pygame.time.wait(1000)
 		else:
+			# if in two player mode and loss occurs, stop the reactor
 			if numPlayers == 2:
 				reactor.stop()
 			self.gameover("YOU LOSE!", numPlayers)
@@ -257,19 +261,22 @@ class GameSpace(Protocol):
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
 
-	# function to end the game cleanly upon a loss 
+	# function to end the game cleanly upon a loss or win and offer play again
 	def gameover(self, outcome, numPlayers):
-		if outcome == "YOU WON!":
-			if int(self.opponentScore) > self.score:
-				outcome = "YOU LOST! The opponent scored more points than you"
-			elif int(self.opponentScore) == self.score:
-				outcome = "YOU TIED! The opponent had the same score as you"
+		# determine actual winner in two-player scenario
+		if numPlayers == 2:
+			if outcome == "YOU WON!":
+				if int(self.opponentScore) > self.score:
+					outcome = "YOU LOST! The opponent scored more points than you"
+				elif int(self.opponentScore) == self.score:
+					outcome = "YOU TIED! The opponent had the same score as you"
 		if outcome == "YOU WON!":
 			try:
 				pygame.mixer.music.load("../sounds/ta-da.wav")
 				pygame.mixer.music.play()
 			except:
 				print("Error loading ../sounds/ta-da.wav")
+		# load in the end screen
 		self.screen.fill(self.black)
 		text = outcome
 		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-20, self.height/2-60))
@@ -286,6 +293,7 @@ class GameSpace(Protocol):
 		clicked = False
 		main1 = False
 		main2 = False
+		# run while the player hasn't clicked on either of the buttons
 		while not clicked:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -301,16 +309,19 @@ class GameSpace(Protocol):
 							if pos[1] >= self.height/2+50 and pos[1] <= self.height/2+80:
 								clicked = True
 								main2 = True
+		# restart the game and re-initialize the gamespace
 		self.__init__()
 		if main1 == True:
 			self.main1()
 		elif main2 == True:
-			self.opponentScore = 'Waiting for opponent...'
+			self.opponentScore = '0'
 			self.main2()
 		else: 
 			pass
 
 	# main1 begins once we press the player 1 start button
+	# we separated main1 from main2 b/c we didn't want to accidentally
+	# break a well-working one-player game by adding in two-player
 	def main1(self):
 		pygame.key.set_repeat(1,100)
 		# need to figure out how to add in the proper sound effects
@@ -360,6 +371,7 @@ class GameSpace(Protocol):
 							self.queue = 4
 						else:
 							self.queue = 4
+			# check the self queue to see what arrows the player has pressed
 			if self.queue == 1 and self.board[y][x - 1] == '1':
 				self.moveDir = 'left'
 			elif self.queue == 2 and self.board[y][x + 1] == '1':
@@ -385,16 +397,14 @@ class GameSpace(Protocol):
 			# update the screen
 			pygame.display.flip()
 
-	# function to hold the stuff in the while loop
+	# function to hold the stuff in the while loop for two-player
 	def loopFunction(self):
-
 		self.sendCount += 1
 		# move the ghosts
 		self.red_ghost.move(self, 'red', self.player1.getx(gs), self.player1.gety(gs))
 		self.blue_ghost.move(self, 'blue', self.player1.getx(gs), self.player1.gety(gs))
 		self.pink_ghost.move(self, 'pink', self.player1.getx(gs), self.player1.gety(gs))
 		self.orange_ghost.move(self, 'orange', self.player1.getx(gs), self.player1.gety(gs))
-		
 		# prepare to check travelled
 		_new = self.player1.rect.move(self.player1.movepos)
 		x = int(_new.centerx/self.player1.speed)
@@ -428,6 +438,7 @@ class GameSpace(Protocol):
 						self.queue = 4
 					else:
 						self.queue = 4
+		# check the self queue to see what arrows the player has pressed
 		if self.queue == 1 and self.board[y][x - 1] == '1':
 			self.moveDir = 'left'
 		elif self.queue == 2 and self.board[y][x + 1] == '1':
@@ -467,21 +478,18 @@ class GameSpace(Protocol):
 			pygame.mixer.music.play(-1)
 		except:
 			print("Error loading ../sounds/pacman_waka.wav")
-		
 		# create the data factory and make the connection
 		self.datafact = DataFactory()
 		reactor.connectTCP("ash.campus.nd.edu", 41097, self.datafact)
-		
 		# start the looping call on the loop function 
+		# display waiting text until connection is made		
 		self.screen.fill(self.black)
 		text = "Waiting for opponent..."
 		self.screen.blit(self.font.render(text, 1, (255,255,255)), (self.width/2-60, self.height/2))
 		pygame.display.update()		
 		reactor.run()
 
-
 	# functions for the data connection   
-
 	def connectionMade(self):
 		self.transport.write(str(self.score))
 		lc = LoopingCall(self.loopFunction)
@@ -495,6 +503,7 @@ class GameSpace(Protocol):
 		else:
 			self.opponentEnd = True
 
+# class for the DataFactory that is instantiated in main2
 
 class DataFactory(ClientFactory):
    
@@ -504,8 +513,7 @@ class DataFactory(ClientFactory):
 	def buildProtocol(self, addr):
 		return self.myconn
 
-
-# run main
+# run the main execution
 if __name__ == '__main__':
 	#log.startLogging(sys.stdout)
 	gs = GameSpace()
