@@ -151,8 +151,8 @@ class GameSpace(Protocol):
 		self.screen.blit(directions1, (452, 72))
 		self.screen.blit(directions2, (452, 88))
 		self.screen.blit(directions3, (452, 104))
-		self.screen.blit(button1, (520, 144))
-		self.screen.blit(button2, (520, 184))
+		self.screen.blit(button1, (510, 144))
+		self.screen.blit(button2, (510, 184))
 		pygame.display.update()
 		clicked = False
 		main1 = False
@@ -264,12 +264,17 @@ class GameSpace(Protocol):
 	# function to end the game cleanly upon a loss or win and offer play again
 	def gameover(self, outcome, numPlayers):
 		# determine actual winner in two-player scenario
+		outcome2 = ''
 		if numPlayers == 2:
 			if outcome == "YOU WON!":
-				if int(self.opponentScore) > self.score:
-					outcome = "YOU LOST! The opponent scored more points than you"
-				elif int(self.opponentScore) == self.score:
-					outcome = "YOU TIED! The opponent had the same score as you"
+				if self.opponentEnd == True:
+					if int(self.opponentScore) > self.score:
+						suppl
+						outcome = "YOU LOST!"
+						outcome2 = "The opponent scored more points than you"
+					elif int(self.opponentScore) == self.score:
+						outcome = "YOU LOST!"
+						outcome2 = "The opponent had the same score as you but finished first"
 		if outcome == "YOU WON!":
 			try:
 				pygame.mixer.music.load("../sounds/ta-da.wav")
@@ -284,11 +289,13 @@ class GameSpace(Protocol):
 			text2 = " Play again?"
 			text3 = "1 PLAYER"
 			text4 = "2 PLAYER"
-			pygame.draw.rect(self.screen, (255,255,255), (self.width/2-40, self.height/2,100,30))
-			pygame.draw.rect(self.screen, (255,255,255), (self.width/2-40, self.height/2+50,100,30))
+			pygame.draw.rect(self.screen, (255,255,255), (self.width/2-32, self.height/2,100,30))
+			pygame.draw.rect(self.screen, (255,255,255), (self.width/2-32, self.height/2+50,100,30))
 			self.screen.blit(self.font.render(text2, 1, (255,255,255)), (self.width/2-20, self.height/2-30))
-			self.screen.blit(self.font.render(text3, 1, (0,0,0)), (self.width/2-15, self.height/2+10))
-			self.screen.blit(self.font.render(text4, 1, (0,0,0)), (self.width/2-15, self.height/2+60))
+			self.screen.blit(self.font.render(text3, 1, (0,0,0)), (self.width/2-15, self.height/2+8))
+			self.screen.blit(self.font.render(text4, 1, (0,0,0)), (self.width/2-15, self.height/2+58))
+		else:
+			self.screen.blit(self.font.render(outcome2, 1, (255,255,255)), (self.width/2-80, self.height/2-30))
 		pygame.display.update()	
 		clicked = False
 		main1 = False
@@ -297,6 +304,8 @@ class GameSpace(Protocol):
 		while not clicked:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
+					# for some reason throws a Deferred error but 
+					# we already have stopped the reactor...?
 					sys.exit()
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
